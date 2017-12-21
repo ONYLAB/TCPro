@@ -140,7 +140,7 @@ M0=ones(6,1)*0; % pmole
 % Human: Total naive T helper cells per kg body weight is: 876E6 cells/L*5L(blood
 % volume)= 4.3800e+009 cells
 Tpf = 0.1/1E6;
-NT0=ones(N,1)*CD4*Tpf;%4.3800e+009*0.33/1E6; % cells
+NT0=ones(N,1)*CD4*Tpf*SimType;%4.3800e+009*0.33/1E6; % cells
 
 % AT_N0: initial number of activated T helper cell derived from naive T cells
 AT_N0=ones(N,1)*0.0; % cells
@@ -149,7 +149,7 @@ AT_N0=ones(N,1)*0.0; % cells
 AT_M0=ones(N,1)*0.0; % cells
 
 % MT0: initial number of memory T helper cell
-MT0=ones(N,1)*CD4*(1-Tpf); % cells
+MT0=ones(N,1)*CD4*((1-Tpf*SimType)); % cells
 
 % FT0: initial number of functional T helper cell
 FT0=ones(N,1)*0.0; % cells

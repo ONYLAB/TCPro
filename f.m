@@ -87,10 +87,10 @@ FT=y((32+17*N):(31+18*N)); %#ok<NASGU>
 pM_NUMBER=(pM+0.0*repmat(cptM',N,1))*ones(6,1)*1E-12*NA;%*(1-sign(kon(1,1)));
 
 % The activation function D for helper T cells
-D_N=(MD/(MD+sum(NT(1))+sum(AT_N(1))+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
+D_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
 
 % The proliferation/differentiation function E for helper T cells
-E_N=(MD/(MD+sum(NT(1))+sum(AT_N(1))+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
+E_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
 
 % Differential equations
 % Ag, y(2), total amount of antigenic protein in the well, pmole
@@ -143,10 +143,10 @@ dydt((32+14*N):(31+15*N),1)=DeltaNT*D_N.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N;
 
 % AT_M, y((35+15*N):(34+16*N)),	activated helper T cells derived from MT, cells
 sAt = E_N>=0;
-dydt((32+15*N):(31+16*N),1)= MD*0.1616 + BetaNT*(NT0)+sAt.*RhoAT.*E_N.*AT_N;% % %%(1-sign(kon(1,1)))*(BetaNT*MT) + sign(kon(1,1))*BetaNT*(MT0) + 
+dydt((32+15*N):(31+16*N),1)= MD*(MT/(MT+sum(AT_N)))*0.1616 + BetaNT*(NT0)+sAt.*RhoAT.*E_N.*AT_N;% % %%(1-sign(kon(1,1)))*(BetaNT*MT) + sign(kon(1,1))*BetaNT*(MT0) + 
 
 % NT0Rest, y((35+16*N):(34+17*N)), NT0Rest
-dydt((32+16*N):(31+17*N),1)=MD*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
+dydt((32+16*N):(31+17*N),1)=MD*(MT/(MT+sum(AT_N)))*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
 
 %place holder, y((35+17*N):(34+18*N)) 
 dydt((32+17*N):(31+18*N),1)= repmat(0.0,N,1); %#ok<REPMAT>
