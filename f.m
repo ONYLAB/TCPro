@@ -88,10 +88,14 @@ pM_NUMBER=(pM+0.0*repmat(cptM',N,1))*ones(6,1)*1E-12*NA;%*(1-sign(kon(1,1)));
 
 % The activation function D for helper T cells
 D_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
-
+if isnan(D_N)
+    D_N=0.0;
+end
 % The proliferation/differentiation function E for helper T cells
 E_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
-
+if isnan(E_N)
+    E_N=0.0;
+end
 % Differential equations
 % Ag, y(2), total amount of antigenic protein in the well, pmole
 dydt(1,1)=-(ID+MD)*AlphaAgE*VD*(Ag/Vp);
