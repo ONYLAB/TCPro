@@ -1,11 +1,11 @@
 % This code were applied for simulating in vivo immune response in human against Adalimumab.
 % The dosing regimen was based on clinical dosing regimen of Adalimumab.
-function [response,kon,numactivatedT] = Main_human(DayLimit,SimType,epitopes,HLA_DR) %#ok<STOUT>
+function [response,kon,numactivatedT] = Main_human(DayLimit,SimType,epitopes,HLA_DR,donor_ID) %#ok<STOUT>
 
 % clc
 close all
 % clear all
-% rng(0)
+rng(donor_ID);
 
 % Main simulation
 
