@@ -1,6 +1,3 @@
-% The protein-specific parameters in this current code were used for
-% simulating in vivo immune response in human against Adalimumab.
-
 function Parameters(SimType,epitopes,HLA_DR)
 
 %% Celltype distribution
@@ -13,7 +10,7 @@ MaxNumPBMCs = 6e6;
 % Vp: well volume
 Vp = 2e-3;%2.75; % L This is the Volume of the sample
 SampleConcentration = 0.3e-6; %Molar This is the actual concentration of the samples with respect to the cell-excluded volume
-Dose = SampleConcentration*Vp*1e12;  % pmole
+Dose = SimType*SampleConcentration*Vp*1e12;  % pmole
 
 Endotoxin = 0.0042*1e3; %ng/L
 % NA: Avogadro constant
@@ -55,7 +52,10 @@ koffN=8.64*1E-3*ones(6,1)*4000; %  day-1 NOT USED
 AlphaAgE=14.4; %day-1
 
 %	BetaAgE	: degradation rate for AgE in acidic vesicles
-BetaAgE= 17.28; % day-1
+BetaAgE = 17.28; % day-1
+if length(epitopes{1})<25
+    BetaAgE = BetaAgE*100;
+end
 
 %	Beta_p:	degradation rate for T-epitope peptide (same for all peptides)
 Beta_p= 14.4; % day-1

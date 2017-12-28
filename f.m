@@ -110,16 +110,16 @@ dydt(3,1)=-BetaID*ID-DeltaID*ID*(MS/Vp)/((MS/Vp)+KMS);
 dydt(4,1)=DeltaID*ID*(MS/Vp)/((MS/Vp)+KMS)-BetaMD*MD;
 
 % cpE, y(8), endogenous competing protein in endosome, pmole
-dydt(5,1)=BetaAgE*(cp0-cpE);
+dydt(5,1)=0.0;%BetaAgE*(cp0-cpE);
 
 % cptE, y(9), endogenous competing peptide in endosome, pmole
-dydt(6,1)=BetaAgE*cpE -Beta_p*cptE -(konN.*(cptE*(ME/VE)))'*ones(6,1)+(koffN.*cptME)'*ones(6,1);
+dydt(6,1)=0.0;%BetaAgE*cpE -Beta_p*cptE -(konN.*(cptE*(ME/VE)))'*ones(6,1)+(koffN.*cptME)'*ones(6,1);
 
 % cptME, y(10:15), endogenous competing peptide-MHC complex in endosome, pmole
-dydt((7:12),1)=konN*cptE.*(ME/VE)-koffN.*cptME -Beta_pM*cptME -kext*cptME;
+dydt((7:12),1)=0.0;%konN*cptE.*(ME/VE)-koffN.*cptME -Beta_pM*cptME -kext*cptME;
 
 % cptM, y(16:21), endogenous peptide-MHC complex on dendritic cell membrane, pmole
-dydt((13:18),1)=kext*cptME -koffN.*cptM;
+dydt((13:18),1)=0.0;%kext*cptME -koffN.*cptM;
 
 %AgE, y(22), Ag in the endosome, pmole
 dydt(19,1)=AlphaAgE*VD*(Ag/Vp)-BetaAgE*AgE;
@@ -150,7 +150,7 @@ sAt = E_N>=0;
 dydt((32+15*N):(31+16*N),1)= MD*(MT/(MT+sum(AT_N)))*0.1616 + BetaNT*(NT0)+sAt.*RhoAT.*E_N.*AT_N;% % %%(1-sign(kon(1,1)))*(BetaNT*MT) + sign(kon(1,1))*BetaNT*(MT0) + 
 
 % NT0Rest, y((35+16*N):(34+17*N)), NT0Rest
-dydt((32+16*N):(31+17*N),1)=MD*(MT/(MT+sum(AT_N)))*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
+dydt((32+16*N):(31+17*N),1)=MD*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
 
 %place holder, y((35+17*N):(34+18*N)) 
 dydt((32+17*N):(31+18*N),1)= repmat(0.0,N,1); %#ok<REPMAT>
