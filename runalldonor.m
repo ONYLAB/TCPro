@@ -1,4 +1,4 @@
-function [cpmresponse,eliresponse,kon,responsevector,significancevector] = runalldonor(theepitope)
+function [responsesummary,significantresponsesummary,kon,responsevector,significancevector] = runalldonor(theepitope)
 
 allelelist = readtable('detailedAlleleshaplotypeddonorNETMHCIIreadablewithoutDQBno345.dat','Delimiter',',');
 epitopes{1} = theepitope;
@@ -14,15 +14,15 @@ for donor_ID = 1:height(allelelist)
     cd(num2str(donor_ID));
     HLA_DR{1} = allelelist{donor_ID,1}{1};
     HLA_DR{2} = allelelist{donor_ID,2}{1};
-    [maxeliresponsevector(donor_ID),maxcpmresponsevector(donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
+    [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
     cd ..
     save
 end
 toc
-cpmresponse = 100*sum(maxcpmresponsevector>2)/height(allelelist);
-eliresponse = 100*sum(maxeliresponsevector>2)/height(allelelist);
+% cpmresponse = 100*sum(maxcpmresponsevector>2)/height(allelelist);
+% eliresponse = 100*sum(maxeliresponsevector>2)/height(allelelist);
 
-function [maxeliresponsevector,maxcpmresponsevector,responsevector,significancevector,kon] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID)
+function [responsesummary,significantresponsesummary,responsevector,significancevector,kon] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID)
 
 colnames = {};
 colnameindex = 0;
@@ -52,8 +52,8 @@ ELISPOTresp = mean(ELISPOT(Daylimit-4,:,2)) / mean(ELISPOT(Daylimit-4,:,1));
 significancevector = [significancevector; p];
 responsevector = [responsevector; ELISPOTresp];
 
-maxeliresponsevector = ELISPOTresp;
-maxcpmresponsevector = max(responsevector);
+responsesummary = sum(responsevector>2); %out of 5
+significantresponsesummary = sum((responsevector>2).*(significancevector<0.05));
 
 % sem = stdresp;
 % LT = 3; %Line thickness

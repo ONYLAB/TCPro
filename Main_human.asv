@@ -56,11 +56,11 @@ ME1=y_record(numel(t_record),(20+N):(25+N));
 pME1=y_record(numel(t_record),(26+N):(25+7*N));
 pM1=y_record(numel(t_record),(26+7*N):(25+13*N));
 M1=y_record(numel(t_record),(26+13*N):(31+13*N));
-NT1=y_record(numel(t_record),(32+13*N):(32+13*N));
-AT_N1=y_record(numel(t_record),(33+13*N):(32+14*N));
-AT_M1=y_record(numel(t_record),(33+14*N):(32+15*N));
-MT1=y_record(numel(t_record),(33+15*N):(32+16*N));
-FT1=y_record(numel(t_record),(33+16*N):(32+17*N));
+NT1=y_record(numel(t_record),(32+13*N):(33+14*N));
+AT_N1=y_record(numel(t_record),(32+14*N):(31+15*N));
+AT_M1=y_record(numel(t_record),(32+15*N):(31+16*N));
+MT1=y_record(numel(t_record),(32+16*N):(31+17*N));
+FT1=y_record(numel(t_record),(32+17*N):(31+18*N));
 
 % Initial condition vector
 AT_M1 = 0.0*AT_M1; %This is a place holder for proliferation
@@ -121,15 +121,15 @@ pM_vector=y_record(:,(26+7*N):(25+13*N));
 % M, free MHC II molecule on dendritic cell menbrane, pmole
 M_vector=y_record(:,(26+13*N):(31+13*N)); %#ok<NASGU>
 % NT,	Na�ve helper T cells, number of cells
-NT_vector=y_record(:,(32+13*N):(32+13*N));
+NT_vector=y_record(:,(32+13*N):(31+14*N));
 % AT_N,	activated helper T cells derived from naive T cells, number of cells
-AT_N_vector=y_record(:,(33+13*N):(32+14*N));
+AT_N_vector=y_record(:,(32+14*N):(31+15*N));
 % AT_M,	activated helper T cells derived from memory T cells, number of cells
-AT_M_vector=y_record(:,(33+14*N):(32+15*N));
+AT_M_vector=y_record(:,(32+15*N):(31+16*N));
 % MT, memory helper T cells, number of cells
-MT_vector=y_record(:,(33+15*N):(32+16*N)); %#ok<NASGU>
+MT_vector=y_record(:,(32+16*N):(31+17*N)); %#ok<NASGU>
 % FT, functional helper T cells, number of cells
-FT_vector=y_record(:,(33+16*N):(32+17*N)); %#ok<NASGU>
+FT_vector=y_record(:,(32+17*N):(31+18*N)); %#ok<NASGU>
 
 % Post-processing calculation
 % Antigen presentation processes
@@ -187,4 +187,4 @@ save(savefile, 'koff', 't_record','Ag_vector','MS_vector','ID_vector','MD_vector
 % axis square
 
 response = AT_M_vector(end,1);
-numactivatedT = AT_N_vector(end,1) + MD_vector(end,1);
+numactivatedT = AT_N_vector(end,1);

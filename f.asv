@@ -73,15 +73,15 @@ pM=reshape(y((26+7*N):(25+13*N)),N,6);
 % M, free MHC II molecule on dendritic cell membrane
 M=y((26+13*N):(31+13*N));
 % NT, naï¿½ve helper T cells
-NT=y((32+13*N):(32+13*N));
+NT=y((32+13*N):(33+13*N));
 % AT_N	activated helper T cells
-AT_N=y((33+13*N):(32+14*N));
+AT_N=y((34+13*N):(33+14*N));
 % AT_M	activated helper T cells
-AT_M=y((33+14*N):(32+15*N));
+AT_M=y((34+14*N):(33+15*N));
 % MT, memory helper T cells
-MT=y((33+15*N):(32+16*N));
+MT=y((34+15*N):(33+16*N));
 % FT, functional helper T cells
-FT=y((33+16*N):(32+17*N)); %#ok<NASGU>
+FT=y((34+16*N):(33+17*N)); %#ok<NASGU>
 
 % Calculate functions for helper T cells activation, proliferation, or differentiation
 
@@ -89,12 +89,12 @@ FT=y((33+16*N):(32+17*N)); %#ok<NASGU>
 pM_NUMBER=(pM+0.0*repmat(cptM',N,1))*ones(6,1)*1E-12*NA;%*(1-sign(kon(1,1)));
 
 % The activation function D for helper T cells
-D_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
+D_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
 if isnan(D_N)
     D_N=0.0;
 end
 % The proliferation/differentiation function E for helper T cells
-E_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
+E_N=(MD/(MD+sum(NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
 if isnan(E_N)
     E_N=0.0;
 end
@@ -142,17 +142,17 @@ dydt((26+7*N):(25+13*N),1)=reshape(kext*pME -koff.*pM,6*N,1);
 dydt((26+13*N):(31+13*N),1)=-kin*M +(ones(1,N)*(koff.*pM))'+koffN.*cptM;
 
 % NT, y((35+13*N):(34+14*N)), naïve helper T cells,  cells
-dydt((32+13*N):(32+13*N),1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);                                    %PREVIOUSLY: BetaNT*(NT0-NT)-DeltaNT*D_N.*NT;
+dydt((32+13*N):(33+13*N),1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);                                    %PREVIOUSLY: BetaNT*(NT0-NT)-DeltaNT*D_N.*NT;
 
 %AT_N, y((35+14*N):(34+15*N)), activated helper T cells derived from NT, cells
-dydt((33+13*N):(32+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N;
+dydt((34+13*N):(33+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N;
 
 % AT_M, y((35+15*N):(34+16*N)),	activated helper T cells derived from MT, cells
 sAt = E_N>=0;
-dydt((33+14*N):(32+15*N),1)= MD*RhoNT + sAt.*RhoAT.*E_N.*AT_N;
+dydt((34+14*N):(33+15*N),1)= MD*RhoNT + BetaNT*(NT0)+sAt.*RhoAT.*E_N.*AT_N;% % %%(1-sign(kon(1,1)))*(BetaNT*MT) + sign(kon(1,1))*BetaNT*(MT0) + 
 
 % NT0Rest, y((35+16*N):(34+17*N)), NT0Rest
-dydt((33+15*N):(32+16*N),1)=0.0;%MD*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
+dydt((34+15*N):(33+16*N),1)=0.0;%MD*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
 
 %place holder, y((35+17*N):(34+18*N)) 
-dydt((33+16*N):(32+17*N),1)= repmat(0.0,N,1); %#ok<REPMAT>
+dydt((34+16*N):(33+17*N),1)= repmat(0.0,N,1); %#ok<REPMAT>

@@ -83,14 +83,17 @@ VE=0.05*VD; % L
 
 
 %% T helper cells
+% RhoNT: maximum proliferation rate for activated helper T cells
+RhoNT=0.1616; % day-1
+
 %BetaNT: death rate of naive helper T cells
-BetaNT=0.018; % day-1
+BetaNT=0.3048;%%PREVIOUSLY:0.018; % day-1
 
 %DeltaNT: maximum activation rate of naive helper T cells
 DeltaNT=1.5; % day-1
 
 % RhoAT: maximum proliferation rate for activated helper T cells
-RhoAT=1.5; % day-1
+RhoAT=0.5973; % day-1
 
 %BetaAT: death rate of activated helper T cells
 BetaAT=0.18; % day-1
@@ -139,8 +142,8 @@ M0=ones(6,1)*0; % pmole
 % of T-epitope-specific T helper cells (protein-specific)
 % Human: Total naive T helper cells per kg body weight is: 876E6 cells/L*5L(blood
 % volume)= 4.3800e+009 cells
-Tpf = 0.1/1E6;
-NT0=ones(N,1)*CD4*Tpf*SimType;%4.3800e+009*0.33/1E6; % cells
+Fp = ones(N,1)*0.1/1E6;
+NT0=CD4;%4.3800e+009*0.33/1E6; % cells
 
 % AT_N0: initial number of activated T helper cell derived from naive T cells
 AT_N0=ones(N,1)*0.0; % cells
@@ -149,7 +152,7 @@ AT_N0=ones(N,1)*0.0; % cells
 AT_M0=ones(N,1)*0.0; % cells
 
 % MT0: initial number of memory T helper cell
-MT0=ones(N,1)*CD4*((1-Tpf*SimType)); % cells
+MT0=ones(N,1)*0.0; % cells
 
 % FT0: initial number of functional T helper cell
 FT0=ones(N,1)*0.0; % cells
@@ -183,16 +186,18 @@ pars(29+12*N)=KpM_N;
 pars(30+12*N)=VD;
 pars(31+12*N)=VE;
 % T helper cells
-pars(32+12*N)=BetaNT;
-pars(33+12*N)=DeltaNT;
-pars(34+12*N)=RhoAT;
-pars(35+12*N)=BetaAT;
+pars(32+12*N)=RhoNT;
+pars(33+12*N)=BetaNT;
+pars(34+12*N)=DeltaNT;
+pars(35+12*N)=RhoAT;
+pars(36+12*N)=BetaAT;
+pars(37+12*N:36+13*N)=Fp;
 % Initial conditions as parameters in the differential equations:
-pars(36+12*N)=ID0;
-pars(37+12*N)=cpE0;
-pars((38+12*N):(43+12*N))=ME0;
-pars((44+12*N):(43+13*N))=NT0;
-pars((44+13*N):(43+14*N))=MT0;
+pars(37+13*N)=ID0;
+pars(38+13*N)=cpE0;
+pars((39+13*N):(44+13*N))=ME0;
+pars((45+13*N):(44+14*N))=NT0;
+pars((45+14*N):(44+15*N))=MT0;
 pars=pars';
 
 save Parameters.mat
