@@ -25,7 +25,7 @@ scale = 100.0/totcellafterdepletion;
 x = x*scale;
 x(5) = 0;
 
-rng('shuffle');
+% rng('shuffle');
 InitPBMC = rand*(MaxNumPBMCs-MinNumPBMCs) + MinNumPBMCs; %Random initial number of cells/mililiter
 
 NumCellsper_ml = InitPBMC*x/100;
