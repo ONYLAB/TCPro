@@ -21,7 +21,11 @@ NA = 6.0221367e23;
 % ME0:  initial amount of MHC-II molecule in a single mature dendritic cell pmole
 % kon: on rate for for T-epitope-MHC-II binding
 % koff:	off rate for for T-epitope-MHC-II binding
-[kon,koff,N,ME0] = doNETMHCIIpan(epitopes,HLA_DR,SimType,NA);
+
+% Number of HLA molecules
+numHLADR = 1e5;
+
+[kon,koff,N,ME0] = doNETMHCIIpan(epitopes,HLA_DR,SimType,NA,numHLADR);
 
 %% Dendritic cells
 % BetaMS: decay rate for the maturation signals (LPS)
@@ -38,7 +42,6 @@ KMS= 9.852E3; % ng/L
 
 % BetaMD:	death rate of mature dendritic cells
 BetaMD=0.2310; % day-1
-
 
 %% Antigen presentation
 
@@ -202,11 +205,10 @@ pars=pars';
 
 save Parameters.mat
 
-function [kon,koff,N,ME0] = doNETMHCIIpan(epitopes,HLA_DR,SimType,NA)
+function [kon,koff,N,ME0] = doNETMHCIIpan(epitopes,HLA_DR,SimType,NA,numHLADR)
 %% Collect -on, -off rates, number of epitopes and amount of initial MHC
 % molecules
 EpitopePresent = 1;
-numHLADR = 1e5;
 N = length(epitopes);
 if N<1
     EpitopePresent = 0;
