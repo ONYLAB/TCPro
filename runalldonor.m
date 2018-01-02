@@ -1,4 +1,4 @@
-function [responsesummary,significantresponsesummary,kon,responsevector,significancevector] = runalldonor(theepitope)
+function [responsesummary,significantresponsesummary,kon,responsevector,significancevector] = runalldonor(theepitope,ParChangeIndex,ParChange)
 
 allelelist = readtable('detailedAlleleshaplotypeddonorNETMHCIIreadablewithoutDQBno345.dat','Delimiter',',');
 epitopes{1} = theepitope;
@@ -14,7 +14,7 @@ for donor_ID = 1:1%height(allelelist)
     cd(num2str(donor_ID));
     HLA_DR{1} = allelelist{donor_ID,1}{1};
     HLA_DR{2} = allelelist{donor_ID,2}{1};
-    [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
+    [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID,ParChangeIndex,ParChange);
     cd ..
     save
 end
@@ -22,7 +22,7 @@ toc
 % cpmresponse = 100*sum(maxcpmresponsevector>2)/height(allelelist);
 % eliresponse = 100*sum(maxeliresponsevector>2)/height(allelelist);
 
-function [responsesummary,significantresponsesummary,responsevector,significancevector,kon] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID)
+function [responsesummary,significantresponsesummary,responsevector,significancevector,kon] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID,ParChangeIndex,ParChange)
 
 colnames = {};
 colnameindex = 0;
@@ -33,11 +33,11 @@ for Daylimit = 5:8
         n=6;
     end
     for i = 1:n
-        [response(Daylimit-4,i,1),kon,ELISPOT(Daylimit-4,i,1)] = Main_human(Daylimit,0,epitopes,HLA_DR,donor_ID);%SimType=0, with sample
+        [response(Daylimit-4,i,1),kon,ELISPOT(Daylimit-4,i,1)] = Main_human(Daylimit,0,epitopes,HLA_DR,donor_ID,ParChangeIndex,ParChange);%SimType=0, with sample
         status = movefile('Parameters.mat',['D' num2str(Daylimit) '_CULTURE_n' num2str(i) 'Parameters.mat']);
         status = movefile('results.mat',['D' num2str(Daylimit) '_CULTURE_n' num2str(i) 'results.mat']);
         
-        [response(Daylimit-4,i,2),kon,ELISPOT(Daylimit-4,i,2)] = Main_human(Daylimit,1,epitopes,HLA_DR,donor_ID);%SimType=1, with sample
+        [response(Daylimit-4,i,2),kon,ELISPOT(Daylimit-4,i,2)] = Main_human(Daylimit,1,epitopes,HLA_DR,donor_ID,ParChangeIndex,ParChange);%SimType=1, with sample
         status = movefile('Parameters.mat',['D' num2str(Daylimit) '_SAMPLE_n' num2str(i) 'Parameters.mat']);
         status = movefile('results.mat',['D' num2str(Daylimit) '_SAMPLE_n' num2str(i) 'results.mat']);
     end
