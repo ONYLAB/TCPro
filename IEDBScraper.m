@@ -1,4 +1,4 @@
-function rank = IEDBScraper(peptidesequence,nallele,allelelist)
+function IEDBScraper(peptidesequence,nallele,allelelist)
 
 url = 'http://tools-cluster-interface.iedb.org/tools_api/mhcii/';
 method = 'method';
@@ -11,7 +11,8 @@ for i = 1:nallele
     if i>1
         alleleSelect = [alleleSelect ','];
     end
-    al = allelelist{i};
+    al = strrep(['HLA-' allelelist{i}],'_','*');
+    al = [al(1:end-2) ':' al(end-1:end)];
     alleleSelect = [alleleSelect al];
     % alleleSelect = 'HLA-DRB1*10:01,HLA-DRB1*12:01';
 end
@@ -45,3 +46,4 @@ end
 
 % convert rank to affinity
 % kon = f(rank);
+% 'IEDB_KD.dat' dlmwrite
