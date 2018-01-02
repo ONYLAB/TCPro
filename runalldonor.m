@@ -5,7 +5,7 @@ epitopes{1} = theepitope;
 mypwd = pwd;
 addpath(mypwd);
 tic
-for donor_ID = 1:height(allelelist)
+for donor_ID = 1:1%height(allelelist)
     
     disp(['Donor: ' num2str(donor_ID)]);
     
