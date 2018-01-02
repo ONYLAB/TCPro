@@ -10,7 +10,7 @@ N=pars(4);
 kon=reshape(pars(5:(4+6*N)),N,6);
 koff= reshape(pars((5+6*N):(4+12*N)), N,6);
 % Dendritic cells
-BetaMS=pars(5+12*N);
+MS0=pars(5+12*N);
 BetaID=pars(6+12*N);
 DeltaID=pars(7+12*N);
 KMS=pars(8+12*N);

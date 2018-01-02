@@ -170,7 +170,7 @@ pars(4)=N;
 pars(5:(4+6*N))=reshape(kon,6*N,1);
 pars((5+6*N):(4+12*N))= reshape(koff, 6*N,1);
 % Dendritic cells
-pars(5+12*N)=BetaMS;
+pars(5+12*N)=MS0;
 pars(6+12*N)=BetaID;
 pars(7+12*N)=DeltaID;
 pars(8+12*N)=KMS;

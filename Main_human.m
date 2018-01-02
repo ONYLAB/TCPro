@@ -20,6 +20,7 @@ numberoftimespamples = 100;
 Parameters(SimType,epitopes,HLA_DR); %SimType=1 if with Sample, 0 if without
 load Parameters.mat; %#ok<LOAD>
 pars(ParChangeIndex) = ParChange*pars(ParChangeIndex);
+MS0=pars(5+12*N);
 
 % Run the ODEs
 options = odeset('RelTol',1e-10, 'AbsTol',1e-10);
