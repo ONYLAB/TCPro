@@ -112,7 +112,7 @@ MD0=0; % cells
 cp0=0.0;%110E6*Vp; % pmole
 
 % cpE0: initial amount of endogenous competing protein in endosome
-cpE0=1e6/NA*1e12;%110E6*2.75;   % pmole
+cpE0=0.0;%1e6/NA*1e12;%110E6*2.75;   % pmole
 
 % cptE0: initial amount of endogenous competing peptide in endosome
 cptE0=0;   % pmole
