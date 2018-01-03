@@ -242,7 +242,6 @@ for i = 2:N
     koff = [koff;temp];
 end
 
-
 function Affinity_DR = givekon(epitopesequence,nallele,HLAtext)
 %% Run NetMHCIIPan if not done before, extract association rates
 % data(1).Sequence = 'epitopesequence'
@@ -255,3 +254,4 @@ if exist('IEDB_KD.dat')==0 %#ok<EXIST>
     IEDBScraper(epitopesequence,nallele,HLAtext);
 end
 Affinity_DR = dlmread('IEDB_KD.dat');
+Affinity_DR = Affinity_DR(:)';
