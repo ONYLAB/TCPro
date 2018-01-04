@@ -1,4 +1,6 @@
 function RankvsnmperAlleleperseqlength()
+% This function is reading in NetMHCIIpan thresholds data in Logk50 units 
+% and converting them into nM values
 
 conversiontable = readtable('pseudosequences.dat');
 mypwd = pwd;
