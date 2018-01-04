@@ -1,4 +1,5 @@
 function dotheTestPlots()
+% Comparison time plot, how do things look for KD 1nM vs KD 4uM
 
 load resultsWithTolerableDrug.mat
 plotit(AT_M_vector,t_record)

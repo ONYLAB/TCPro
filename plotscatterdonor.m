@@ -1,5 +1,6 @@
 function donres = plotscatterdonor()
-
+% This function is for showing the stimulation index values per donor per
+% drug
 close all
 load('matlab.mat','allmeanresponses','seqtable');
 

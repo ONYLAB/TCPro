@@ -1,4 +1,5 @@
 function plotdonorsTemplate()
+% Plot generator to compare with Lamberth et al 2017 Fig 4B
 
 % load final_matlab.mat;
 donres = plotscatterdonor();

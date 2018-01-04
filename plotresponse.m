@@ -1,4 +1,5 @@
 function plotresponse(Day,TYPE,n)
+% Time dependent Cell Count plot
 
 if TYPE == 'S'
     load(['D' num2str(Day) '_SAMPLE_n' num2str(n) 'results.mat']);
