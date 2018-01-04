@@ -30,6 +30,7 @@ for i = 1:height(seqtable)
     xlim([0 52])
     set(gca,'yscale','log')
     avgrank(i) = mean(mean(rank(i,:,:)));
+    grid on
     save('kds.mat');
     
 %     h=histogram(donrank(:,i),round(sqrt(51)),'Normalization','probability');    
