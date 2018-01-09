@@ -87,7 +87,7 @@ VE=0.05*VD; % L
 
 %% T helper cells
 % RhoNT: maximum proliferation rate for activated helper T cells
-RhoNT=0.1616; % day-1
+RhoNT=0.1432; % day-1
 
 %BetaNT: death rate of naive helper T cells
 BetaNT=0.3048;%%PREVIOUSLY:0.018; % day-1
