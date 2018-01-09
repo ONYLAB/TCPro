@@ -20,6 +20,11 @@ numberoftimespamples = 100;
 Parameters(SimType,epitopes,HLA_DR); %SimType=1 if with Sample, 0 if without
 load Parameters.mat; %#ok<LOAD>
 
+newpars = dlmread('newparamsforoptimization.dat');
+pars(32+12*N)=newpars(1); %RhoNT;
+pars(35+12*N)=newpars(2); %RhoAT;
+pars(36+12*N)=newpars(3); %BetaAT;
+
 % Run the ODEs
 options = odeset('RelTol',1e-10, 'AbsTol',1e-10);
 % DayLimit = 8;
