@@ -13,7 +13,8 @@ NA = 6.0221367e23;
 %% Celltype distribution
 MinNumPBMCs = 4e6; %per ml
 MaxNumPBMCs = 6e6; %per ml
-[ID0,NK,BC,CD4,CD8,MC] = collectdonorPBMC_analyze(MinNumPBMCs,MaxNumPBMCs,Vp);
+VolProliferationCellStock = Vp * 0.5;
+[ID0,NK,BC,CD4,CD8,MC] = collectdonorPBMC_analyze(MinNumPBMCs,MaxNumPBMCs,VolProliferationCellStock);
 % ID0: the initial number of immature dendritic cell
 
 %% T-epitope characteristics of therapeutic proteins
