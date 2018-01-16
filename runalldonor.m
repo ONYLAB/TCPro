@@ -16,7 +16,7 @@ for donor_ID = 1:height(allelelist)
     HLA_DR{2} = allelelist{donor_ID,2}{1};
     [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
     cd ..
-    save
+%     save
 end
 toc
 % cpmresponse = 100*sum(maxcpmresponsevector>2)/height(allelelist);
@@ -69,7 +69,7 @@ significantresponsesummary = sum((responsevector>2).*(significancevector<0.05));
 % ylabel(ylabeltext);
 % axis square
 % title(['Donor#' num2str(donor_ID)]);
-save([num2str(donor_ID) '.mat'],'response','ELISPOTresp','responsevector','significancevector');
+% save([num2str(donor_ID) '.mat'],'response','ELISPOTresp','responsevector','significancevector');
 % close
 
 % T = table(coldata','RowNames',colnames);

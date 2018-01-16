@@ -1,9 +1,10 @@
 function optimizationdriver()
 
+% RhoNT: maximum proliferation rate for activated helper T cells
 RhoNT=0.1432; % day-1
 
-%BetaNT: death rate of naive helper T cells
-RhoAT=1.5;%%PREVIOUSLY:0.018; % day-1
+% RhoAT: maximum proliferation rate for activated helper T cells
+RhoAT=1.1; % day-1
 
 %BetaAT: death rate of activated helper T cells
 BetaAT=0.18; % day-1
