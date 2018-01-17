@@ -1,4 +1,4 @@
-function [responsesummary,significantresponsesummary,kon,responsevector,significancevector] = runalldonor(theepitope)
+function [responsesummary,significantresponsesummary,kon,responsevector,significancevector] = runalldonor(theepitope,expid)
 
 allelelist = readtable('detailedAlleleshaplotypeddonorNETMHCIIreadablewithoutDQBno345.dat','Delimiter',',');
 epitopes{1} = theepitope;
@@ -14,7 +14,7 @@ for donor_ID = 1:height(allelelist)
     cd(num2str(donor_ID));
     HLA_DR{1} = allelelist{donor_ID,1}{1};
     HLA_DR{2} = allelelist{donor_ID,2}{1};
-    [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
+    [responsesummary(1,donor_ID),significantresponsesummary(1,donor_ID),responsevector{donor_ID},significancevector{donor_ID},kon{donor_ID}] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID*expid);
     cd ..
 %     save
 end
