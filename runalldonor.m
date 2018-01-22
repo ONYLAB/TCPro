@@ -14,7 +14,7 @@ for donor_ID = 1:height(allelelist)
     cd(num2str(donor_ID));
     HLA_DR{1} = allelelist{donor_ID,1}{1};
     HLA_DR{2} = allelelist{donor_ID,2}{1};
-    [responsevector(donor_ID,:,:),decision(donor_ID)] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
+    [responsevector(donor_ID,:,:),decision(1,donor_ID)] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID);
     cd ..
 %     save
 end
@@ -27,7 +27,7 @@ function [responsevector,decision] = run3samplesDaylimit(epitopes,HLA_DR,donor_I
 colnames = {};
 colnameindex = 0;
 coldata = [];
-n=12;
+n=3;
 for Daylimit = 5:8
     for i = 1:n
         [response(Daylimit-4,i,1),kon,ELISPOT(Daylimit-4,i,1)] = Main_human(Daylimit,0,epitopes,HLA_DR,donor_ID*i);%SimType=0, with sample

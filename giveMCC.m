@@ -5,8 +5,8 @@ function MCC = giveMCC(Lamberth,Drug)
 
 FN = cm(2,1);
 FP = cm(1,2);
-TP = cm(1,1);
-TN = cm(2,2);
+TN = cm(1,1);
+TP = cm(2,2);
 
 MCC = TP*TN - FP*FN;
 a = TP + FP;
