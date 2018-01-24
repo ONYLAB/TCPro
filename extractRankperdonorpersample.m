@@ -11,18 +11,20 @@ for i = 1:height(seqtable)
     seqid = seqtable{i,'SEQNAME'}{1};
     cd(seqid)
     subplot(2,4,list(i));
-    for d = 1:51
+    for d = 1:50
        cd(num2str(d))
         netmhcIItbl = readtable('out.dat');
         rank(i,d,:) = netmhcIItbl{1,[6 9]};
         kd(i,d,:) = netmhcIItbl{1,[6 9]-1};
         donrank(d,i) = mean(mean(rank(i,d,:)));
        cd ..
-       plothla(d,rank(i,d,:),colid(i));
+%        plothla(d,rank(i,d,:),colid(i));
+       plothla(d,kd(i,d,:),colid(i));
+
     end
     cd ..
-%     ylabel('K_D (nM)');
-    ylabel('%Affinity rank');
+    ylabel('K_D (nM)');
+%     ylabel('%Affinity rank');
     xlabel('DonorID');
     set(gcf,'color','w');
     title(seqid)

@@ -1,4 +1,4 @@
-function MCC = giveMCC(Lamberth,Drug)
+function [MCC,cm] = giveMCC(Lamberth,Drug)
 % Give Matthews Correlation Coefficient
 
 [c,cm,ind,per] = confusion(Lamberth,Drug);
