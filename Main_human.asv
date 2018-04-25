@@ -27,7 +27,7 @@ load Parameters.mat; %#ok<LOAD>
 % pars(36+12*N)=newpars(3); %BetaAT;
 
 % Run the ODEs
-options = odeset('RelTol',1e-10, 'AbsTol',1e-10, 'NonNegative', 1:13); %Make sure that all solution components are nonnegative
+options = odeset('RelTol',1e-10, 'AbsTol',1e-10, 'NonNegative', 1:13);
 % DayLimit = 8;
 IncubationTime = 18/24; %days
 

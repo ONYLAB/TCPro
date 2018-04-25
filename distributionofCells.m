@@ -1,31 +1,30 @@
-function NumCellsper_ml = distributionofCells(MinNumPBMCs,MaxNumPBMCs)
+function NumCellsper_ml = distributionofCells(MinNumPBMCs,MaxNumPBMCs,seed)
 
-bookname = 'PBMCdistribution.xlsx';
-opts = detectImportOptions(bookname);
-% opts.DataRange='B3';
-% opts.VariableNamesRange = 'A2';
-opts.RowNamesRange='A3:A8';
+fun = @(x)(sum(x)-100)^2; %x is the vector of cell percentages
 
-CellTypeDist = readtable(bookname,opts);
-
-fun = @(x)(sum(x)-100)^2;
-
-x0 = [-1,2];
-lb = CellTypeDist{:,2};
-ub = CellTypeDist{:,3};
+%Donor cell distribution variability
+rng(seed);
+% Dendritic Cells ; NK Cells; B Cells; CD4+; CD8+; Monocytes
+lb = [0.63;6.84;6.36;26.15;12.38;6.04];
+ub = [1.46;35.17;16.51;48.26;33.11;11.56];
 x0 = rand(6,1).*(ub-lb) + lb; %Random initial Start Point
 options = optimoptions('fmincon','Display','off');
 
+%Variation in the cell type distribution
 x = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
-% validate x
-sum(x);
+% validate x, make sure it is 100% total
+while sum(x)~=100    
+    x = fmincon(fun,x,[],[],[],[],lb,ub,[],options);
+end
+    
 % 5th row is CD8+ so it will be depleted
 totcellafterdepletion = sum(x([1:4 6]));
 scale = 100.0/totcellafterdepletion;
 x = x*scale;
 x(5) = 0;
 
-% rng('shuffle');
+%Variation in the assay
+rng('shuffle');
 InitPBMC = rand*(MaxNumPBMCs-MinNumPBMCs) + MinNumPBMCs; %Random initial number of cells/mililiter
 
 NumCellsper_ml = InitPBMC*x/100;

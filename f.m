@@ -2,157 +2,115 @@ function dydt=f(t,y,pars) %#ok<INUSL>
 
 % Parameter vector
 NA=pars(1);
-% Therapeutic protein PK parameters
 Dose=pars(2); %#ok<NASGU>
 Vp=pars(3);
-% T-epitope characteristics of therapeutic proteins
+%% T-epitope characteristics of therapeutic proteins
 N=pars(4);
 kon=reshape(pars(5:(4+6*N)),N,6);
-koff= reshape(pars((5+6*N):(4+12*N)), N,6);
-% Dendritic cells
-BetaMS=pars(5+12*N);
-BetaID=pars(6+12*N);
-DeltaID=pars(7+12*N);
-KMS=pars(8+12*N);
-BetaMD=pars(9+12*N);
-% Antigen presentation
-konN=pars((10+12*N):(15+12*N));
-koffN=pars((16+12*N):(21+12*N));
-AlphaAgE=pars(22+12*N);
-BetaAgE=pars(23+12*N);
-Beta_p=pars(24+12*N);
-BetaM=pars(25+12*N);
-Beta_pM=pars(26+12*N);
-kext=pars(27+12*N);
-kin=pars(28+12*N);
-KpM_N=pars(29+12*N);
-VD=pars(30+12*N);
-VE=pars(31+12*N);
-% T helper cells
-RhoNT=pars(32+12*N);
-BetaNT=pars(33+12*N);
-DeltaNT=pars(34+12*N);
-RhoAT=pars(35+12*N);
-BetaAT=pars(36+12*N);
-Fp=pars(37+12*N:36+13*N);
-% Initial conditions as parameters in the differential equations:
-ID0=pars(37+13*N); %#ok<NASGU>
-cp0=pars(38+13*N);
-ME0=pars((39+13*N):(44+13*N));
-NT0=pars((45+13*N):(44+14*N));
-MT0=pars((45+14*N):(44+15*N));
+koff= reshape(pars((5+6*N):(4+12*N)),N,6);
+%% Dendritic cells
+BetaID=pars(5+12*N);
+DeltaID=pars(6+12*N);
+KMS=pars(7+12*N);
+BetaMD=pars(8+12*N);
+%% Antigen presentation
+AlphaAgE=pars(9+12*N);
+BetaAgE=pars(10+12*N);
+Beta_p=pars(11+12*N);
+BetaM=pars(12+12*N);
+Beta_pM=pars(13+12*N);
+kext=pars(14+12*N);
+kin=pars(15+12*N);
+KpM_N=pars(16+12*N);
+VD=pars(17+12*N);
+VE=pars(18+12*N);
+%% T helper cells
+RhoNT=pars(19+12*N);
+BetaNT=pars(20+12*N);
+DeltaNT=pars(21+12*N);
+RhoAT=pars(22+12*N);
+BetaAT=pars(23+12*N);
+Fp=pars(24+12*N:23+13*N);
+%% Initial conditions as parameters in the differential equations:
+ID0=pars(24+13*N); %#ok<NASGU>
+ME0=pars((25+13*N):(30+13*N));
 
-% State variables for the differential equations
+%% State variables for the differential equations
 % Ag, antigenic protein in the plasma compartment
 Ag=y(1);
 % MS, maturation signal for Immature dendritic cells
 MS=y(2);
-% ID,	Immature dendritic cells
+% ID, Immature dendritic cells
 ID=y(3);
-% MD,	mature dendritic cells
+% MD, mature dendritic cells
 MD=y(4);
-% cpE, endogenous competing protein in the endosomes
-cpE=y(5);
-% cptE, endogenous competing peptide in the endosomes
-cptE=y(6);
-% cptME, competing peptide-MHC complex in the endosomes
-cptME=y(7:12);
-% cptM, competing peptide-MHC complex on dendritic cell membrane
-cptM=y(13:18);
 %AgE, Ag in the endosomes
-AgE=y(19);
-% pE,	free epitope peptides from Ag digestion
-pE=y((19+1):(19+N));
-% ME(1:6),	free MHC II molecule in endosome
-ME=y((20+N):(25+N));
+AgE=y(5);
+% pE, free epitope peptides from Ag digestion (N Epitopes)
+pE=y((5+1):(5+N));
+% ME(1:6), free MHC II molecule in endosome (6 MHCIIs allowed)
+ME=y((6+N):(11+N));
 % pME(N,6),	epitope peptide-MHC II complex in endosomes
-% pME is in a matrix form, N epitopes against 6 possible MHC alleles
-pME=reshape(y((26+N):(25+7*N)),N,6);
-% pM(N,6),	epitope peptide-MHC II complex on dendritic cell membrane
-pM=reshape(y((26+7*N):(25+13*N)),N,6);
-% M, free MHC II molecule on dendritic cell membrane
-M=y((26+13*N):(31+13*N));
-% NT, naï¿½ve helper T cells
-NT=y((32+13*N):(32+13*N));
-% AT_N	activated helper T cells
-AT_N=y((33+13*N):(32+14*N));
-% AT_M	activated helper T cells
-AT_M=y((33+14*N):(32+15*N));
-% MT, memory helper T cells
-MT=y((33+15*N):(32+16*N));
-% FT, functional helper T cells
-FT=y((33+16*N):(32+17*N)); %#ok<NASGU>
+pME=reshape(y((12+N):(11+7*N)),N,6); % pME is in a matrix form, N epitopes against 6 possible MHC alleles
+% pM(N,6), epitope peptide-MHC II complex on dendritic cell membrane
+pM=reshape(y((12+7*N):(11+13*N)),N,6);
+% M, free MHC II molecule on dendritic cell membrane (6 MHCIIs allowed)
+M=y((12+13*N):(17+13*N));
+% NT, naïve helper T cells
+NT=y(18+13*N);
+% AT_N activated helper T cells (N Epitopes)
+AT_N=y((19+13*N):(18+14*N));
+% Prolif, Placeholder for proliferating cells MD+AT
+Prolif=y((19+14*N):(19+15*N)); %#ok<NASGU>
 
-% Calculate functions for helper T cells activation, proliferation, or differentiation
+%% Calculate functions for helper T cells activation, proliferation, or differentiation
 
 % Adding up all the pM molecules from one epitope against 6 different MHC alleles
-pM_NUMBER=(pM+0.0*repmat(cptM',N,1))*ones(6,1)*1E-12*NA;%*(1-sign(kon(1,1)));
+pM_NUMBER=pM*ones(6,1)*1E-12*NA; %pM is an Nx6 matrix
 
 % The activation function D for helper T cells
-D_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));   % for naive T cells
-if isnan(D_N)
-    D_N=0.0;
-end
+D_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));
+
 % The proliferation/differentiation function E for helper T cells
-E_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)+0.0*sum(AT_M)+0.0*sum(MT)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));  % for naive T cells
-if isnan(E_N)
-    E_N=0.0;
-end
-% Differential equations
-% Ag, y(2), total amount of antigenic protein in the well, pmole
+E_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)))*((pM_NUMBER-KpM_N)./(pM_NUMBER+KpM_N));
+
+%% Differential equations
+% Ag, y(1), total amount of antigenic protein in the well, pmole
 dydt(1,1)=-(ID+MD)*AlphaAgE*VD*(Ag/Vp);
 
-% MS, y(5), maturation signal, particularly, LPS, for immature dendritic cells, ng
+% MS, y(2), maturation signal, particularly, LPS, for immature dendritic cells, ng
 dydt(2,1)=-(ID+MD)*AlphaAgE*VD*(MS/Vp);
 
-% ID, y(6), immature dendritic cells, cells
+% ID, y(3), immature dendritic cells, cells
 dydt(3,1)=-BetaID*ID-DeltaID*ID*(MS/Vp)/((MS/Vp)+KMS);
 
-% MD,	y(7), mature dendritic cells , cells
+% MD,	y(4), mature dendritic cells, cells
 dydt(4,1)=DeltaID*ID*(MS/Vp)/((MS/Vp)+KMS)-BetaMD*MD;
 
-% cpE, y(8), endogenous competing protein in endosome, pmole
-dydt(5,1)=0.0;%BetaAgE*(cp0-cpE);
+%AgE, y(5), Ag in the endosome, pmole
+dydt(5,1)=AlphaAgE*VD*(Ag/Vp)-BetaAgE*AgE;
 
-% cptE, y(9), endogenous competing peptide in endosome, pmole
-dydt(6,1)=0.0;%BetaAgE*cpE -Beta_p*cptE -(konN.*(cptE*(ME/VE)))'*ones(6,1)+(koffN.*cptME)'*ones(6,1);
+% pE, y((5+1):(5+N)), T-epitope peptides from Ag digestion, pmole
+dydt((5+1):(5+N),1)=BetaAgE*AgE-Beta_p*pE-kon.*(pE*(ME'/VE))*ones(6,1)+koff.*pME*ones(6,1);
 
-% cptME, y(10:15), endogenous competing peptide-MHC complex in endosome, pmole
-dydt((7:12),1)=0.0;%konN*cptE.*(ME/VE)-koffN.*cptME -Beta_pM*cptME -kext*cptME;
+% ME, y((6+N):(11+N)),free MHC-II molecule in endosome, pmole
+dydt((6+N):(11+N),1)= BetaM*(ME0-ME)-(ones(1,N)*(kon.*(pE*(ME'/VE))))'+(ones(1,N)*(koff.*pME))'+kin*M;
 
-% cptM, y(16:21), endogenous peptide-MHC complex on dendritic cell membrane, pmole
-dydt((13:18),1)=0.0;%kext*cptME -koffN.*cptM;
+% pME, y((12+N):(11+7*N)), T-epitope-MHC-II complex in endosome, pmole
+dydt((12+N):(11+7*N),1)= reshape(kon.*(pE*(ME'/VE))-koff.*pME -Beta_pM*pME -kext*pME,6*N,1);
 
-%AgE, y(22), Ag in the endosome, pmole
-dydt(19,1)=AlphaAgE*VD*(Ag/Vp)-BetaAgE*AgE;
+% pM,	y((12+7*N):(11+13*N)), T-epitope-MHC-II complex on dendritic cell membrane, pmole
+dydt((12+7*N):(11+13*N),1)=reshape(kext*pME -koff.*pM,6*N,1);
 
-% pE, y(23:(22+N)), T-epitope peptides from Ag digestion, pmole
-dydt((20:(19+N)),1)=BetaAgE*AgE-Beta_p*pE-kon.*(pE*(ME'/VE))*ones(6,1)+koff.*pME*ones(6,1);
+% M, y((29+13*N):(34+13*N)), free MHC-II molecule on dendritic cell membrane, pmole
+dydt((12+13*N):(17+13*N),1)=-kin*M +(ones(1,N)*(koff.*pM))';
 
-% ME, y((23+N):(28+N)),	free MHC-II molecule in endosome, pmole
-dydt((20+N):(25+N),1)= BetaM*(ME0-ME)-(ones(1,N)*(kon.*(pE*(ME'/VE))))'+(ones(1,N)*(koff.*pME))'-konN*cptE.*(ME/VE)+koffN.*cptME +kin*M;
+% NT, y(18+13*N), naïve helper T cells pool, cells
+dydt(18+13*N,1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);
 
-% pME, y((29+N):(28+7*N)), T-epitope-MHC-II complex in endosome, pmole
-dydt(((26+N):(25+7*N)),1)= reshape(kon.*(pE*(ME'/VE))-koff.*pME -Beta_pM*pME -kext*pME,6*N,1);
+% AT_N, y((19+13*N):(18+14*N)), activated helper T cells derived from NT cells
+dydt((19+13*N):(18+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N; 
 
-% pM,	y((29+7*N):(28+13*N)), T-epitope-MHC-II complex on dendritic cell membrane, pmole
-dydt((26+7*N):(25+13*N),1)=reshape(kext*pME -koff.*pM,6*N,1);
-
-% M, y((29+13*N):(34+13*N)), free MHC-II molecule on dendritic cell menbrane, pmole
-dydt((26+13*N):(31+13*N),1)=-kin*M +(ones(1,N)*(koff.*pM))'+koffN.*cptM;
-
-% NT, y((35+13*N):(34+14*N)), naïve helper T cells,  cells
-dydt((32+13*N):(32+13*N),1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);                                    %PREVIOUSLY: BetaNT*(NT0-NT)-DeltaNT*D_N.*NT;
-
-%AT_N, y((35+14*N):(34+15*N)), activated helper T cells derived from NT, cells
-dydt((33+13*N):(32+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N;
-
-% AT_M, y((35+15*N):(34+16*N)),	activated helper T cells derived from MT, cells
-sAt = E_N>=0;
-dydt((33+14*N):(32+15*N),1)= MD*RhoNT + sAt.*RhoAT.*E_N.*AT_N;
-
-% NT0Rest, y((35+16*N):(34+17*N)), NT0Rest
-dydt((33+15*N):(32+16*N),1)=0.0;%MD*0.1616-0.3048*MT;%This says MT but it's actually NT0Rest
-
-%place holder, y((35+17*N):(34+18*N)) 
-dydt((33+16*N):(32+17*N),1)= repmat(0.0,N,1); %#ok<REPMAT>
+% Prolif, placeholder for proliferating cells MD+AT, y((19+14*N):(18+15*N)) 
+sAt = E_N>=0; %Making sure E_N is positive so we take into account only the proliferating cells
+dydt((19+14*N):(19+15*N),1)=[MD*RhoNT; sAt.*RhoAT.*E_N.*AT_N];
