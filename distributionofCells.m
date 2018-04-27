@@ -13,7 +13,7 @@ options = optimoptions('fmincon','Display','off');
 %Variation in the cell type distribution
 x = fmincon(fun,x0,[],[],[],[],lb,ub,[],options);
 % validate x, make sure it is 100% total
-while sum(x)~=100    
+while sum(x)<99.9 || sum(x)>100.1    
     x = fmincon(fun,x,[],[],[],[],lb,ub,[],options);
 end
     
@@ -24,6 +24,7 @@ x = x*scale;
 x(5) = 0;
 
 %Variation in the assay
+rng('shuffle');
 rng('shuffle');
 InitPBMC = rand*(MaxNumPBMCs-MinNumPBMCs) + MinNumPBMCs; %Random initial number of cells/mililiter
 
