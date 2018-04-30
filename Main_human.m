@@ -1,4 +1,4 @@
-function Response = Main_human(donor_ID,SampleConcentration,Fp) 
+function [Response,pval] = Main_human(donor_ID,SampleConcentration,Fp) 
 
 % SampleConcentration = 5e-6 M for samples 0.3 for HuA33
 close all
@@ -30,8 +30,9 @@ for n = 1:6
         [T1,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
         
         AT_N_vector = Y1(numel(T1),(19+13*N):(18+14*N));
-        MD_vector = Y1(numel(T1),4);
-        numIL2secretors = AT_N_vector(end,1)+MD_vector(end,1);
+%         MD_vector = Y1(numel(T1),4);
+        Prolif_vector = Y1(:,(19+14*N):(19+15*N));
+        numIL2secretors = AT_N_vector(end,1)+Prolif_vector(end,1);
         
         ELISpot(n,SimType+1) = numIL2secretors;
         
@@ -70,10 +71,16 @@ for n=1:3
 end
 
 for i = 1:4
-    Response(i) = mean(squeeze(Incorporation(:,2,i)))/mean(squeeze(Incorporation(:,1,i))); %#ok<AGROW>
+    sample = squeeze(Incorporation(:,2,i));
+    medium = squeeze(Incorporation(:,1,i));
+    Response(i) = mean(sample)/mean(medium); %#ok<AGROW>
+    [~,pval(i)] = ttest2(medium,sample,'Tail','left','Vartype','unequal');
 end
 
-Response(5) = mean(ELISpot(:,2))/mean(ELISpot(:,1));
+sample = ELISpot(:,2);
+medium = ELISpot(:,1);
+Response(5) = mean(sample)/mean(medium);
+[~,pval(5)] = ttest2(medium,sample,'Tail','left','Vartype','unequal');
 
 save 
 
@@ -115,7 +122,7 @@ t_end = DayLimit+IncubationTime;
 tspan2 = linspace(t_start, t_end, numberoftimesamples);
 
 % Call ODE
-[T2,Y2] = ode15s(@f, tspan2, yic2, options,pars);
+[T2,Y2] = ode15s(@f, tspan2, yic2, options,pars); %#ok<ASGLU>
 
 % Prolif, activated helper T cells derived from memory T cells, number of cells
 Prolif_vector = Y2(:,(19+14*N):(19+15*N));

@@ -23,7 +23,7 @@ VolProliferationCellStock = Va * 0.5; %Initially this is 1 mL
 % kon: on rate for for T-epitope-MHC-II binding
 % koff:	off rate for for T-epitope-MHC-II binding
 
-% Number of HLA molecules
+% Number of HLA DRB1 molecules
 numHLADR = 1e5;
 
 [kon,koff,N,ME0] = doNETMHCIIpan(SimType,NA,numHLADR);
@@ -164,7 +164,7 @@ save Parameters.mat
 function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,NA,numHLADR)
 %% Collect -on, -off rates, number of epitopes and amount of initial MHC
 
-rankcutoff  = 20;
+rankcutoff  = 100;
 
 [netmhciipanresult,N,numHLAalleles] = givekon();
 Affinity_DR = reshape(netmhciipanresult(1:numHLAalleles,1),N,numHLAalleles);
@@ -190,9 +190,9 @@ koff=8.64*1E-3*[Affinity_DR Affinity_DPQ]*1E3; %  day-1
 
 function [AffinityandRank_DR,N,numHLAalleles] = givekon()
 % Read out.dat file
-% if exist('shortout.dat')==0 %#ok<EXIST>
+if exist('shortout.dat')==0 %#ok<EXIST>
     getshorty();
-% end
+end
 table = readtable('shortout.dat');
 AffinityandRank_DR = table{:,9:10}; 
 % Structured as 
