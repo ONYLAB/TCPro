@@ -184,6 +184,7 @@ else
     ME0=[numHLADR/2; numHLADR/2;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
 end
 
+EpitopeSurvived = ones(1,6);
 EpitopeLength = 15;
 if ProteinLength>100
     for i = 1:N
