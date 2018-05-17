@@ -34,7 +34,7 @@ for s = AbzI
             SampleConcentration = 5e-6;
         end
         
-        [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(i),SampleConcentration,Fp(s)); %#ok<AGROW>
+        [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,Fp(s)); %#ok<AGROW>
         temp = Response{s,i};
         temp2 = pval{s,i};
         IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
@@ -58,7 +58,7 @@ for s = AbzII
                 SampleConcentration = 5e-6;
             end
             
-            [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(i),SampleConcentration,Fp(s)); %#ok<AGROW>
+            [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,Fp(s)); %#ok<AGROW>
             temp = Response{s,i};
             temp2 = pval{s,i};
             IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
