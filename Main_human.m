@@ -1,4 +1,4 @@
-function [Response,pval] = Main_human(donor_ID,SampleConcentration,Fp) 
+function [Response,pval] = Main_human(donor_ID,ProteinLength,SampleConcentration,Fp) 
 
 % SampleConcentration = 5e-6 M for samples 0.3 for HuA33
 close all
@@ -53,7 +53,7 @@ for n=1:3
 
     for SimType = 0:1
         % Load the parameters
-        Parameters(SimType,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
+        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
         load Parameters.mat; %#ok<LOAD>
         
         % Initial condition vector

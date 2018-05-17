@@ -1,76 +1,78 @@
-function [responsevector,decision] = runalldonor(theepitope,sampleID)
+function [Response,IncoBinary,ELISBinary,Inco] = runalldonor(traj)
 
-allelelist = readtable('detailedAlleleshaplotypeddonorNETMHCIIreadablewithoutDQBno345.dat','Delimiter',',');
-epitopes{1} = theepitope;
-mypwd = pwd;
-addpath(mypwd);
+% IncorporationResponse(n,SimType+1,DayLimit-4)
+% ELISpotResponse(n,SimType+1)
+
+SIcutoff = 1.9;
+sigcutoff = 0.05;
+
+ProteinLength = 40*ones(1,18);
+ProteinLength(10) = 1350; 
+
+AbzI = [2 4 6 7 9 10];
+A33 = 10;
+AbzIList = 1:50;
+AbzIIList = 51:100;%[51:54 56:100];
+AbzII = [12 13 14 15 16 17 18];
+Exenatide = 18;
+
+% Precursor frequencies
+Fp = [0.00    0.04    0.00    0.26    0.00    0.18    0.18    0.00    0.51    0.26    0.00    0.51    0.18    0.04    0.22    0.31    0.04    1.23]/1e6;
+
+% Medium Baseline Precursor frequencies
+% Fp = [0.00    0.18    0.00    0.48    0.00    0.35    0.35    0.00    0.70    0.48    0.00    0.70    0.18    0.09    0.22    0.44    0.13    1.10]/1e6;
+
 tic
-for donor_ID = 1:height(allelelist)
-    
-    disp(['Donor: ' num2str(donor_ID)]);
-    
-    [s,m] = unix(['rm -rf ' num2str(donor_ID)]);
-    mkdir(num2str(donor_ID));
-    cd(num2str(donor_ID));
-    HLA_DR{1} = allelelist{donor_ID,1}{1};
-    HLA_DR{2} = allelelist{donor_ID,2}{1};
-    [responsevector(donor_ID,:,:),decision(1,donor_ID)] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID*sampleID);
+for s = AbzI
+    cd(num2str(s))
+    for i = AbzIList
+        
+        cd(num2str(i));
+        if s==A33
+            SampleConcentration = 0.3e-6;
+        else
+            SampleConcentration = 5e-6;
+        end
+        
+        [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(i),SampleConcentration,Fp(s)); %#ok<AGROW>
+        temp = Response{s,i};
+        temp2 = pval{s,i};
+        IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
+        ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
+        cd ..
+        
+    end
+    disp(s)
     cd ..
-%     save
 end
 toc
-% cpmresponse = 100*sum(maxcpmresponsevector>2)/height(allelelist);
-% eliresponse = 100*sum(maxeliresponsevector>2)/height(allelelist);
-
-function [responsevector,decision] = run3samplesDaylimit(epitopes,HLA_DR,donor_ID)
-
-colnames = {};
-colnameindex = 0;
-coldata = [];
-n=3;
-for Daylimit = 5:8
-    for i = 1:n
-        [response(Daylimit-4,i,1),kon,ELISPOT(Daylimit-4,i,1)] = Main_human(Daylimit,0,epitopes,HLA_DR,donor_ID*i);%SimType=0, with sample
-        status = movefile('Parameters.mat',['D' num2str(Daylimit) '_CULTURE_n' num2str(i) 'Parameters.mat']);
-        status = movefile('results.mat',['D' num2str(Daylimit) '_CULTURE_n' num2str(i) 'results.mat']);
-        
-        [response(Daylimit-4,i,2),kon,ELISPOT(Daylimit-4,i,2)] = Main_human(Daylimit,1,epitopes,HLA_DR,donor_ID*i);%SimType=1, with sample
-        status = movefile('Parameters.mat',['D' num2str(Daylimit) '_SAMPLE_n' num2str(i) 'Parameters.mat']);
-        status = movefile('results.mat',['D' num2str(Daylimit) '_SAMPLE_n' num2str(i) 'results.mat']);
+% % % %
+for s = AbzII
+    cd(num2str(s))
+    for i = AbzIIList
+        if i~=55
+            cd(num2str(i));
+            if s==Exenatide
+                SampleConcentration = 0.3e-6;
+            else
+                SampleConcentration = 5e-6;
+            end
+            
+            [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(i),SampleConcentration,Fp(s)); %#ok<AGROW>
+            temp = Response{s,i};
+            temp2 = pval{s,i};
+            IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
+            ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
+            cd ..
+        end
     end
-
-    responsevector(Daylimit-4,:) = response(Daylimit-4,:,2)./response(Daylimit-4,:,1);
+    disp(s)
+    cd ..
 end
 
-decision = sign(sum(sum(responsevector>1.9)));
+Inco = sum(IncoBinary')'*2;
+ELIS = sum(ELISBinary')'*2;
+% Inco = Inco([AbzI AbzII]);
+% ELIS = ELIS([AbzI AbzII]);
 
-% ELISPOTresp = mean(ELISPOT(Daylimit-4,:,2)) / mean(ELISPOT(Daylimit-4,:,1));
-% [~,p,~,~] = ttest2(ELISPOT(Daylimit-4,:,2),ELISPOT(Daylimit-4,:,1));
-% significancevector = [significancevector; p];
-% responsevector = [responsevector; ELISPOTresp];
-% 
-% responsesummary = sum(responsevector>2); %out of 5
-% significantresponsesummary = sum((responsevector>2).*(significancevector<0.05));
-
-% sem = stdresp;
-% LT = 3; %Line thickness
-% AxFS = 24; %Ax Fontsize
-% AxLW = 2; %Ax LineWidth
-% xlabeltext = 'Time (days)';
-% ylabeltext = 'Response: Stimulation Index';
-% errorbar(5:8,meanresp,sem,'LineWidth',LT);
-% set(gcf,'color','w');
-% set(gca,'fontsize', AxFS);
-% set(gca,'LineWidth',AxLW);
-% xlabel(xlabeltext);
-% ylabel(ylabeltext);
-% axis square
-% title(['Donor#' num2str(donor_ID)]);
-% save([num2str(donor_ID) '.mat'],'response','ELISPOTresp','responsevector','significancevector');
-% close
-
-% T = table(coldata','RowNames',colnames);
-% writetable(T,'myDonorData.dat','WriteRowNames',true);
-
-% maxmeanresp = max(meanresp);
-% maxmeanresp = max(theresponse(:,2))/max(theresponse(:,1));
+save([num2str(traj) '_matlabRcutoff100Prol0597.mat'])

@@ -1,4 +1,4 @@
-function Parameters(SimType,Va,seed,SampleConcentration,Fp)
+function Parameters(SimType,ProteinLength,Va,seed,SampleConcentration,Fp)
 
 %% Therapeutic protein dosage
 
@@ -6,7 +6,10 @@ function Parameters(SimType,Va,seed,SampleConcentration,Fp)
 % SampleConcentration [Molar] This is the actual concentration of the samples with respect to the cell-excluded volume
 Dose = SimType*SampleConcentration*Va*1e12;  % pmole
 
-Endotoxin = 25; %ng/L
+LE = 0.5; %ng/L Lower bound for Endoxin
+UE = 25; %ng/L Upper bound
+Endotoxin = LE + (UE-LE)*rand; %ng/L
+
 % NA: Avogadro constant
 NA = 6.0221367e23;
 
@@ -25,7 +28,7 @@ VolProliferationCellStock = Va * 0.5; %Initial total cell volume is half of the 
 
 % Number of HLA DRB1 molecules
 numHLADR = 1e5;
-[kon,koff,N,ME0] = doNETMHCIIpan(SimType,NA,numHLADR); %N: #Epitopes
+[kon,koff,N,ME0] = doNETMHCIIpan(SimType,ProteinLength,NA,numHLADR); %N: #Epitopes
 
 %% Dendritic cells
 % BetaID: death rate of immature dendritic cells.
@@ -160,7 +163,7 @@ pars=pars'; %#ok<NASGU>
 
 save Parameters.mat
 
-function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,NA,numHLADR)
+function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,ProteinLength,NA,numHLADR)
 %% Collect -on, -off rates, number of epitopes and amount of initial MHC
 
 rankcutoff  = 100;
@@ -181,8 +184,16 @@ else
     ME0=[numHLADR/2; numHLADR/2;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
 end
 
+EpitopeLength = 15;
+if ProteinLength>100
+    for i = 1:N
+        surviveP = ((1-(EpitopeLength-1)/(ProteinLength-1))^round(ProteinLength/EpitopeLength))>rand;
+        EpitopeSurvived(i,:) = surviveP*ones(1,6);
+    end
+end
+
 % kon: on rate for for T-epitope-MHC-II binding
-kon=SimType*rankadjustment*8.64*1E-3; %  pM-1day-1
+kon=SimType*EpitopeSurvived.*rankadjustment*8.64*1E-3; %  pM-1day-1
 
 %	koff:	off rate for for T-epitope-MHC-II binding
 koff=8.64*1E-3*[Affinity_DR Affinity_DPQ]*1E3; %  day-1
