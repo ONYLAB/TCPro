@@ -6,21 +6,19 @@ function [Response,IncoBinary,ELISBinary,Inco] = runalldonor(traj)
 SIcutoff = 1.9;
 sigcutoff = 0.05;
 
-ProteinLength = 40*ones(1,18);
+ProteinLength = 40*ones(1,19);
 ProteinLength(10) = 1350; 
 
 AbzI = [2 4 6 7 9 10];
 A33 = 10;
 AbzIList = 1:50;
 AbzIIList = 51:100;%[51:54 56:100];
-AbzII = [12 13 14 15 16 17 18];
+AbzII = [12 13 14 15 16 17 18 19];
 Exenatide = 18;
+KLH = 19;
 
 % Precursor frequencies
-Fp = [0.00    0.04    0.00    0.26    0.00    0.18    0.18    0.00    0.51    0.26    0.00    0.51    0.18    0.04    0.22    0.31    0.04    1.23]/1e6;
-
-% Medium Baseline Precursor frequencies
-% Fp = [0.00    0.18    0.00    0.48    0.00    0.35    0.35    0.00    0.70    0.48    0.00    0.70    0.18    0.09    0.22    0.44    0.13    1.10]/1e6;
+Fp = [0.00    0.04    0.00    0.26    0.00    0.18    0.18    0.00    0.51    0.26    0.00    0.51    0.18    0.04    0.22    0.31    0.04    1.23  9.86/25]/1e6;
 
 tic
 for s = AbzI
@@ -52,7 +50,7 @@ for s = AbzII
     for i = AbzIIList
         if i~=55
             cd(num2str(i));
-            if s==Exenatide
+            if s==Exenatide || s==KLH
                 SampleConcentration = 0.3e-6;
             else
                 SampleConcentration = 5e-6;
