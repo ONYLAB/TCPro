@@ -155,7 +155,7 @@ pars(20+12*N)=BetaNT;
 pars(21+12*N)=DeltaNT;
 pars(22+12*N)=RhoAT;
 pars(23+12*N)=BetaAT;
-pars(24+12*N:23+13*N)=Fp; %Epitope Dependent - Size N
+pars(24+12*N:23+13*N)=Fp*ones(1,N); %Epitope Dependent - Size N
 % Initial conditions as parameters in the differential equations:
 pars(24+13*N)=ID0;
 pars((25+13*N):(30+13*N))=ME0;
@@ -169,8 +169,8 @@ function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,ProteinLength,NA,numHLADR)
 rankcutoff  = 100;
 
 [netmhciipanresult,N,numHLAalleles] = givekon();
-Affinity_DR = reshape(netmhciipanresult(1:numHLAalleles,1),N,numHLAalleles);
-Rank_DR = reshape(netmhciipanresult(1:numHLAalleles,2),N,numHLAalleles);
+Affinity_DR = reshape(netmhciipanresult(1:N*numHLAalleles,1),N,numHLAalleles);
+Rank_DR = reshape(netmhciipanresult(1:N*numHLAalleles,2),N,numHLAalleles);
 
 Affinity_DPQ=repmat([4000 4000 4000 4000],N,1); %place holder for other alleles (NOT USED in this version)
 
@@ -178,20 +178,20 @@ if numHLAalleles==1 %homozygot
     disp('Homozygote');
     rankadjustment = [Rank_DR<rankcutoff zeros(N,6-1)]; %Nx6 matrix
     ME0=[numHLADR; 0.0;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
-    Affinity_DR = [Affinity_DR 0];
+    Affinity_DR = [Affinity_DR zeros(N,1)];
 else
     rankadjustment = [Rank_DR<rankcutoff zeros(N,6-2)]; %Nx6 matrix
     ME0=[numHLADR/2; numHLADR/2;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
 end
 
-EpitopeSurvived = ones(1,6);
-EpitopeLength = 15;
-if ProteinLength>100
-    for i = 1:N
-        surviveP = ((1-(EpitopeLength-1)/(ProteinLength-1))^round(ProteinLength/EpitopeLength))>rand;
-        EpitopeSurvived(i,:) = surviveP*ones(1,6);
-    end
-end
+EpitopeSurvived = ones(N,6);
+% EpitopeLength = 15;
+% if ProteinLength>100
+%     for i = 1:N
+%         surviveP = ((1-(EpitopeLength-1)/(ProteinLength-1))^round(ProteinLength/EpitopeLength))>rand;
+%         EpitopeSurvived(i,:) = surviveP*ones(1,6);
+%     end
+% end
 
 % kon: on rate for for T-epitope-MHC-II binding
 kon=SimType*EpitopeSurvived.*rankadjustment*8.64*1E-3; %  pM-1day-1
@@ -227,6 +227,8 @@ if contains(pwd,'seqs\10') %exanitide patch
     lists = [57 270]; %use +3 for version 3.1
 elseif contains(pwd,'seqs\18') %exanitide patch 
     lists = [32 65]; %use +3 for version 3.1
+elseif contains(pwd,'seqs\19') %exanitide patch 
+    lists = [14:10:254 263:10:503]; %use +3 for version 3.1
 else
     lists = [12 21]; %use +3 for version 3.1
 end
