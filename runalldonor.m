@@ -1,76 +1,55 @@
-function [Response,IncoBinary,ELISBinary,Inco] = runalldonor(traj)
+function pdMS0 = runalldonor()
 
-% IncorporationResponse(n,SimType+1,DayLimit-4)
-% ELISpotResponse(n,SimType+1)
+% SPW = [];
+% 
+% % ELISpotResponse(n,SimType+1)
+% for i = 1:1000
+%     disp(i)
+%     temp = Main_human(i,1,0.3,0.1); %#ok<AGROW>
+%     SPW = [SPW; temp];
+% end
 
-SIcutoff = 1.9;
-sigcutoff = 0.05;
+load SPWvsMS0.mat;
+MS0 = SPW(:,2); 
+SPW = round(SPW(:,1));
 
-ProteinLength = 40*ones(1,19);
-ProteinLength(10) = 1350; 
+load onlymediumSPW.mat
+histfit([AbzenaImedium;AbzenaIImedium],round(sqrt(597)),'exponential');
+pd = fitdist([AbzenaImedium;AbzenaIImedium],'exponential');
+% truncate(pd,0,inf)
 
-AbzI = [2 4 6 7 9 10];
-A33 = 10;
-AbzIList = 1:50;
-AbzIIList = 51:100;%[51:54 56:100];
-AbzII = [12 13 14 15 16 17 18 19];
-Exenatide = 18;
-KLH = 19;
+% text([num2str(1/pd.mean,'%.2f') 'exp^' num2str(1/pd.mean,'%.2f')]);
 
-% Precursor frequencies
-Fp = [0.00    0.04    0.00    0.26    0.00    0.18    0.18    0.00    0.51    0.26    0.00    0.51    0.18    0.04    0.22    0.31    0.04    1.23  9.86/25]/1e6;
+xlabel('SPW (Medium Only)')
+ylabel('Frequency');
+AxFS = 24; %Ax Fontsize
+AxLW = 2; %Ax LineWidth
+set(gcf,'color','w');
+set(gca,'fontsize', AxFS);
+set(gca,'LineWidth',AxLW);
+axis square
 
-tic
-for s = AbzI
-    cd(num2str(s))
-    for i = AbzIList
-        
-        cd(num2str(i));
-        if s==A33
-            SampleConcentration = 0.3e-6;
-        else
-            SampleConcentration = 5e-6;
-        end
-        
-        [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,Fp(s)); %#ok<AGROW>
-        temp = Response{s,i};
-        temp2 = pval{s,i};
-        IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
-        ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
-        cd ..
-        
-    end
-    disp(s)
-    cd ..
-end
-toc
-% % % %
-for s = AbzII
-    cd(num2str(s))
-    for i = AbzIIList
-        if i~=55
-            cd(num2str(i));
-            if s==Exenatide || s==KLH
-                SampleConcentration = 0.3e-6;
-            else
-                SampleConcentration = 5e-6;
-            end
-            
-            [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,Fp(s)); %#ok<AGROW>
-            temp = Response{s,i};
-            temp2 = pval{s,i};
-            IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
-            ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
-            cd ..
-        end
-    end
-    disp(s)
-    cd ..
-end
+figure
+scatter(MS0,SPW,'k.')
+ylabel('Simulated SPW (Medium Only)')
+xlabel('MS_0 (ng/L)');
+AxFS = 24; %Ax Fontsize
+AxLW = 2; %Ax LineWidth
+set(gcf,'color','w');
+set(gca,'fontsize', AxFS);
+set(gca,'LineWidth',AxLW);
+axis square
+hold on
+plot(0:25,3.113*(0:25),'r-','LineWidth',3)
 
-Inco = sum(IncoBinary')'*2;
-ELIS = sum(ELISBinary')'*2;
-% Inco = Inco([AbzI AbzII]);
-% ELIS = ELIS([AbzI AbzII]);
-
-save([num2str(traj) '_matlabRcutoff100Prol0597.mat'])
+figure
+histfit([AbzenaImedium;AbzenaIImedium]/3.113,round(sqrt(597)),'exponential');
+pdMS0 = fitdist([AbzenaImedium;AbzenaIImedium]/3.113,'exponential');
+xlabel('Fitted MS_0 (ng/L)');
+ylabel('Frequency');
+AxFS = 24; %Ax Fontsize
+AxLW = 2; %Ax LineWidth
+set(gcf,'color','w');
+set(gca,'fontsize', AxFS);
+set(gca,'LineWidth',AxLW);
+axis square

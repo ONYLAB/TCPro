@@ -201,20 +201,20 @@ koff=8.64*1E-3*[Affinity_DR Affinity_DPQ]*1E3; %  day-1
 
 function [AffinityandRank_DR,N,numHLAalleles] = givekon()
 % Read out.dat file
-if exist('shortout.dat')==0 %#ok<EXIST>
-    getshorty();
-end
-table = readtable('shortout.dat');
-AffinityandRank_DR = table{:,9:10}; 
+% if exist('shortout.dat')==0 %#ok<EXIST>
+%     getshorty();
+% end
+% table = readtable('shortout.dat');
+AffinityandRank_DR = [1 1; 1 1];    %placeholder 
 % Structured as 
 % [Epitope1 Allele1; 
 %     Epitope2 Allele1; 
 %     Epitope1 Allele2;
 % Epitope2 Allele2]
 
-N = length(unique(table{:,3})); %Number of epitopes
+N = 1; %Number of epitopes
 
-numHLAalleles = length(unique(table{:,2})); %number of HLAs
+numHLAalleles = 2; %number of HLAs
 
 %% Post process NetMHCIIPan v3.2 out.dat file
 function getshorty()

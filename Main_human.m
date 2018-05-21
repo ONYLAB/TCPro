@@ -1,4 +1,4 @@
-function [Response,pval] = Main_human(donor_ID,ProteinLength,SampleConcentration,Fp) 
+function ELISpot = Main_human(donor_ID,ProteinLength,SampleConcentration,Fp) 
 
 % SampleConcentration = 5e-6 M for samples 0.3 for HuA33
 close all
@@ -17,7 +17,7 @@ ELISpot = zeros(6,2);
 
 for n = 1:6
 
-    for SimType = 0:1
+    for SimType = 0
         
         % Load the parameters
         Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
@@ -35,55 +35,9 @@ for n = 1:6
         numIL2secretors = AT_N_vector(end,1)+Prolif_vector(end,1);
         
         ELISpot(n,SimType+1) = numIL2secretors;
-        
+        ELISpot(n,SimType+2) = Endotoxin;
     end
 end
-%% AssayType == 'incorporation'
-    
-%This is the scale when you take aliquots 2ml to 100 mul
-Va = 2e-3; %L
-VolAliquot = 1e-4; %L
-scaleVOL = VolAliquot/Va;
-
-IncubationTime = 18/24; %days
-
-Incorporation = zeros(3,2,4);
-
-for n=1:3
-
-    for SimType = 0:1
-        % Load the parameters
-        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
-        load Parameters.mat; %#ok<LOAD>
-        
-        % Initial condition vector
-        yic1 = [Ag0; MS0; ID0; MD0; AgE0; pE0; ME0; pME0; pM0; M0; NT0; AT_N0; Prolif0];
-        
-        % Call ODE
-        [T1,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
-        
-%         plotNumCells(T1,Y1,N); %plot if wanted
-        for DayLimit = 5:8
-            Incorporation(n,SimType+1,DayLimit-4) = getincubation(DayLimit,IncubationTime,Y1,T1,scaleVOL,Va,options,pars);
-        end
-    end
-
-end
-
-for i = 1:4
-    sample = squeeze(Incorporation(:,2,i));
-    medium = squeeze(Incorporation(:,1,i));
-    Response(i) = mean(sample)/mean(medium); %#ok<AGROW>
-    [~,pval(i)] = ttest2(medium,sample,'Tail','left','Vartype','unequal');
-end
-
-sample = ELISpot(:,2);
-medium = ELISpot(:,1);
-Response(5) = mean(sample)/mean(medium);
-[~,pval(5)] = ttest2(medium,sample,'Tail','left','Vartype','unequal');
-
-save 
-
 
 function IncorporationResponse = getincubation(DayLimit,IncubationTime,y_record,t_record,scaleVOL,Vp,options,pars)
 
