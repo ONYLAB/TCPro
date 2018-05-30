@@ -1,4 +1,4 @@
-function Parameters(SimType,ProteinLength,Va,seed,SampleConcentration,Fp)
+function Parameters(SimType,ProteinLength,Va,seed,SampleConcentration,Fp,pdMS0)
 
 %% Therapeutic protein dosage
 
@@ -6,9 +6,10 @@ function Parameters(SimType,ProteinLength,Va,seed,SampleConcentration,Fp)
 % SampleConcentration [Molar] This is the actual concentration of the samples with respect to the cell-excluded volume
 Dose = SimType*SampleConcentration*Va*1e12;  % pmole
 
-LE = 0.5; %ng/L Lower bound for Endoxin
-UE = 25; %ng/L Upper bound
-Endotoxin = LE + (UE-LE)*rand; %ng/L
+% LE = 0.5; %ng/L Lower bound for Endoxin
+% UE = 25; %ng/L Upper bound
+rng(seed);
+Endotoxin = random(pdMS0); %LE + (UE-LE)*rand; %ng/L
 
 % NA: Avogadro constant
 NA = 6.0221367e23;
@@ -73,7 +74,7 @@ KpM_N = 400;  % number of complex
 VD=2.54e-12; % L
 
 % VE: volume of endosomes in a dendritic cell
-VE=0.01*VD; % L
+VE=1e-14; % L
 
 %% T helper cells
 % Fp, Epitope dependent frequency of precursor CD4
@@ -122,7 +123,7 @@ M0=ones(6,1)*0; %#ok<NASGU> % pmole
 AT_N0=ones(N,1)*0.0; %#ok<NASGU> % cells
 
 % AT_M0: initial number of activated T helper cell derived from memory T cells
-Prolif0=ones(N+1,1)*0.0; %#ok<NASGU> % cells
+Prolif0=ones(3*N+1,1)*0.0; %#ok<NASGU> % cells
 
 %% Parameter vector
 pars(1)=NA;

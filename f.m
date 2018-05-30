@@ -56,12 +56,12 @@ pME=reshape(y((12+N):(11+7*N)),N,6); % pME is in a matrix form, N epitopes again
 pM=reshape(y((12+7*N):(11+13*N)),N,6);
 % M, free MHC II molecule on dendritic cell membrane (6 MHCIIs allowed)
 M=y((12+13*N):(17+13*N));
-% NT, naïve helper T cells
+% NT, naï¿½ve helper T cells
 NT=y(18+13*N);
 % AT_N activated helper T cells (N Epitopes)
 AT_N=y((19+13*N):(18+14*N));
 % Prolif, Placeholder for proliferating cells MD+AT
-Prolif=y((19+14*N):(19+15*N)); %#ok<NASGU>
+Prolif=y((19+14*N):(19+17*N)); %#ok<NASGU>
 
 %% Calculate functions for helper T cells activation, proliferation, or differentiation
 
@@ -105,7 +105,7 @@ dydt((12+7*N):(11+13*N),1)=reshape(kext*pME -koff.*pM,6*N,1);
 % M, y((29+13*N):(34+13*N)), free MHC-II molecule on dendritic cell membrane, pmole
 dydt((12+13*N):(17+13*N),1)=-kin*M +(ones(1,N)*(koff.*pM))';
 
-% NT, y(18+13*N), naïve helper T cells pool, cells
+% NT, y(18+13*N), naï¿½ve helper T cells pool, cells
 dydt(18+13*N,1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);
 
 % AT_N, y((19+13*N):(18+14*N)), activated helper T cells derived from NT cells
@@ -113,4 +113,4 @@ dydt((19+13*N):(18+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N;
 
 % Prolif, placeholder for proliferating cells MD+AT, y((19+14*N):(18+15*N)) 
 sAt = E_N>=0; %Making sure E_N is positive so we take into account only the proliferating cells
-dydt((19+14*N):(19+15*N),1)=[MD*RhoNT; sAt.*RhoAT.*E_N.*AT_N];
+dydt((19+14*N):(19+17*N),1)=[MD*RhoNT; sAt.*RhoAT.*E_N.*AT_N; DeltaNT*D_N.*Fp.*NT; abs(RhoAT.*E_N.*AT_N)];

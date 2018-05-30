@@ -1,4 +1,4 @@
-function [Response,pval] = Main_human(donor_ID,ProteinLength,SampleConcentration,Fp) 
+function [Response,pval] = Main_human(donor_ID,ProteinLength,SampleConcentration,Fp,pdMS0) 
 
 % SampleConcentration = 5e-6 M for samples 0.3 for HuA33
 close all
@@ -20,7 +20,7 @@ for n = 1:6
     for SimType = 0:1
         
         % Load the parameters
-        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
+        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp,pdMS0); %SimType=1 if with Sample, 0 if without
         load Parameters.mat; %#ok<LOAD>
         
         % Initial condition vector
@@ -29,10 +29,10 @@ for n = 1:6
         % Call ODE
         [T1,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
         
-        AT_N_vector = Y1(numel(T1),(19+13*N):(18+14*N));
-%         MD_vector = Y1(numel(T1),4);
-        Prolif_vector = Y1(:,(19+14*N):(19+15*N));
-        numIL2secretors = AT_N_vector(end,1)+Prolif_vector(end,1);
+%         AT_N_vector = Y1(numel(T1),(19+13*N):(18+14*N));
+% %         MD_vector = Y1(numel(T1),4);
+        IL2S = Y1(:,(19+14*N):(19+17*N));
+        numIL2secretors = sum(IL2S(end,[1 N+2:3*N+1]));
         
         ELISpot(n,SimType+1) = numIL2secretors;
         
@@ -53,7 +53,7 @@ for n=1:3
 
     for SimType = 0:1
         % Load the parameters
-        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp); %SimType=1 if with Sample, 0 if without
+        Parameters(SimType,ProteinLength,Va,donor_ID,SampleConcentration,Fp,pdMS0); %SimType=1 if with Sample, 0 if without
         load Parameters.mat; %#ok<LOAD>
         
         % Initial condition vector
@@ -82,7 +82,7 @@ medium = ELISpot(:,1);
 Response(5) = mean(sample)/mean(medium);
 [~,pval(5)] = ttest2(medium,sample,'Tail','left','Vartype','unequal');
 
-save 
+% save 
 
 
 function IncorporationResponse = getincubation(DayLimit,IncubationTime,y_record,t_record,scaleVOL,Vp,options,pars)
@@ -106,7 +106,7 @@ pM1 = y_record(t_index,(12+7*N):(11+13*N));
 M1 = y_record(t_index,(12+13*N):(17+13*N));
 NT1 = y_record(t_index,18+13*N);
 AT_N1 = y_record(t_index,(19+13*N):(18+14*N));
-Prolif1 = y_record(t_index,(19+14*N):(19+15*N));
+Prolif1 = y_record(t_index,(19+14*N):(19+17*N));
 
 % Initial condition vector
 Prolif1 = 0.0*Prolif1; %This is a place holder for proliferation
