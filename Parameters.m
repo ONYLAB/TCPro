@@ -120,10 +120,10 @@ pM0=ones(6*N,1)*0;  %#ok<NASGU> % pmole
 M0=ones(6,1)*0; %#ok<NASGU> % pmole
 
 % AT_N0: initial number of activated T helper cell derived from naive T cells
-AT_N0=ones(N,1)*0.0; %#ok<NASGU> % cells
+AT_N0=0.0; %#ok<NASGU> % cells
 
 % AT_M0: initial number of activated T helper cell derived from memory T cells
-Prolif0=ones(3*N+1,1)*0.0; %#ok<NASGU> % cells
+Prolif0=ones(4,1)*0.0; %#ok<NASGU> % cells
 
 %% Parameter vector
 pars(1)=NA;
@@ -156,10 +156,10 @@ pars(20+12*N)=BetaNT;
 pars(21+12*N)=DeltaNT;
 pars(22+12*N)=RhoAT;
 pars(23+12*N)=BetaAT;
-pars(24+12*N:23+13*N)=Fp*ones(1,N); %Epitope Dependent - Size N
+pars(24+12*N)=Fp; %Epitope Dependent - Size 1
 % Initial conditions as parameters in the differential equations:
-pars(24+13*N)=ID0;
-pars((25+13*N):(30+13*N))=ME0;
+pars(25+12*N)=ID0;
+pars((26+12*N):(31+12*N))=ME0;
 pars=pars'; %#ok<NASGU>
 
 save Parameters.mat

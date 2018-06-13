@@ -30,10 +30,10 @@ BetaNT=pars(20+12*N);
 DeltaNT=pars(21+12*N);
 RhoAT=pars(22+12*N);
 BetaAT=pars(23+12*N);
-Fp=pars(24+12*N:23+13*N);
+Fp=pars(24+12*N);
 %% Initial conditions as parameters in the differential equations:
-ID0=pars(24+13*N); %#ok<NASGU>
-ME0=pars((25+13*N):(30+13*N));
+ID0=pars(25+12*N); %#ok<NASGU>
+ME0=pars((26+12*N):(31+12*N));
 
 %% State variables for the differential equations
 % Ag, antigenic protein in the plasma compartment
@@ -59,14 +59,14 @@ M=y((12+13*N):(17+13*N));
 % NT, na�ve helper T cells
 NT=y(18+13*N);
 % AT_N activated helper T cells (N Epitopes)
-AT_N=y((19+13*N):(18+14*N));
+AT_N=y((19+13*N));
 % Prolif, Placeholder for proliferating cells MD+AT
-Prolif=y((19+14*N):(19+17*N)); %#ok<NASGU>
+Prolif=y((20+13*N):(23+13*N)); %#ok<NASGU>
 
 %% Calculate functions for helper T cells activation, proliferation, or differentiation
 
 % Adding up all the pM molecules from one epitope against 6 different MHC alleles
-pM_NUMBER=pM*ones(6,1)*1E-12*NA; %pM is an Nx6 matrix
+pM_NUMBER=sum(pM*ones(6,1)*1E-12*NA); %pM is an Nx6 matrix times 6x1 gives Nx1 summing it gives 1x1 scalar number
 
 % The activation function D for helper T cells
 D_N=(MD/(MD+sum(Fp.*NT)+sum(AT_N)))*(((pM_NUMBER)./(pM_NUMBER+KpM_N)));
@@ -109,8 +109,8 @@ dydt((12+13*N):(17+13*N),1)=-kin*M +(ones(1,N)*(koff.*pM))';
 dydt(18+13*N,1)=MD*RhoNT-BetaNT*NT-sum(DeltaNT*D_N.*Fp.*NT);
 
 % AT_N, y((19+13*N):(18+14*N)), activated helper T cells derived from NT cells
-dydt((19+13*N):(18+14*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N; 
+dydt((19+13*N),1)=DeltaNT*D_N.*Fp.*NT+RhoAT.*E_N.*AT_N-BetaAT*AT_N; 
 
 % Prolif, placeholder for proliferating cells MD+AT, y((19+14*N):(18+15*N)) 
 sAt = E_N>=0; %Making sure E_N is positive so we take into account only the proliferating cells
-dydt((19+14*N):(19+17*N),1)=[MD*RhoNT; sAt.*RhoAT.*E_N.*AT_N; DeltaNT*D_N.*Fp.*NT; abs(RhoAT.*E_N.*AT_N)];
+dydt((20+13*N):(23+13*N),1)=[MD*RhoNT; sAt.*RhoAT.*E_N.*AT_N; DeltaNT*D_N.*Fp.*NT; abs(RhoAT.*E_N.*AT_N)];

@@ -29,10 +29,8 @@ for n = 1:6
         % Call ODE
         [T1,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
         
-%         AT_N_vector = Y1(numel(T1),(19+13*N):(18+14*N));
-% %         MD_vector = Y1(numel(T1),4);
-        IL2S = Y1(:,(19+14*N):(19+17*N));
-        numIL2secretors = sum(IL2S(end,[1 N+2:3*N+1]));
+        IL2S = Y1(:,(20+13*N):(23+13*N));
+        numIL2secretors = sum(IL2S(end,[1 3:4]));
         
         ELISpot(n,SimType+1) = numIL2secretors;
         
@@ -125,7 +123,7 @@ tspan2 = linspace(t_start, t_end, numberoftimesamples);
 [T2,Y2] = ode15s(@f, tspan2, yic2, options,pars); %#ok<ASGLU>
 
 % Prolif, activated helper T cells derived from memory T cells, number of cells
-Prolif_vector = Y2(:,(19+14*N):(19+15*N));
+Prolif_vector = Y2(:,(20+13*N):(21+13*N));
 
 IncorporationResponse = sum(Prolif_vector(end,:)); %#Proliferated cells
 
