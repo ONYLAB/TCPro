@@ -213,9 +213,15 @@ AffinityandRank_DR = table{:,9:10};
 %     Epitope1 Allele2;
 % Epitope2 Allele2]
 
-N = length(unique(table{:,3})); %Number of epitopes
+N15mer = length(unique(table{:,3})); %Number of epitopes
+allele1 = AffinityandRank_DR(1:N15mer,:);
+allele2 = AffinityandRank_DR(N15mer+1:end,:);
+
+AffinityandRank_DR = [1./sum(1./allele1,1); 1./sum(1./allele2,1)];
 
 numHLAalleles = length(unique(table{:,2})); %number of HLAs
+
+N = 1;
 
 %% Post process NetMHCIIPan v3.2 out.dat file
 function getshorty()
