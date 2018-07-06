@@ -1,92 +1,78 @@
-function [Response,IncoBinary,ELISBinary,COMBOBinary,Inco,ELIS,COMBO,corrs] = runalldonor(traj)
+function runalldonor()
 
-% IncorporationResponse(n,SimType+1,DayLimit-4)
-% ELISpotResponse(n,SimType+1)
+cd ..\Input
+[antigenname,cohortname,Nrun,MeanFp,StdFp,SampleConcentration,cohort,SIcutoff,sigcutoff] = readinputs();
+cd ..\Bin
 
-load pdMS0.mat;
+pdMS0 = makedist('Exponential','mu',5.2285); %Probability distribution for initial Maturation signal concentration in the well
 
-SIcutoff = 1.9;
-sigcutoff = 0.05;
+randomseeds = randi(2^32-1,Nrun,height(cohort));
+IncoBinary = zeros(Nrun,height(cohort));
+ELISBinary = IncoBinary;
+similarity = zeros(Nrun,1);
 
-ProteinLength = 40*ones(1,19);
-ProteinLength(10) = 1350; 
-
-AbzI = [2 4 6 7 9 10];
-A33 = 10;
-AbzIList = 1:50;
-AbzIIList = 51:100;%[51:54 56:100];
-AbzII = [12 13 14 15 16 17 18 19];
-Exenatide = 18;
-KLH = 19;
-
-% Precursor frequencies
-     
-Fp = [0.00    0.31    0.00    0.52    0.00    0.39    0.45    0.00    0.91    0.61    0.00    0.91    0.73    0.56    0.78    0.98    0.58    1.78  9.86]/1e6;
-FpSTD = [0    0.08    0       0.11    0       0.09    0.10    0       0.11    0.13    0       0.23    0.15    0.12    0.15    0.18    0.12    0.29 1.45]/1e6;
-
-tic
-for s = AbzI
-    cd(num2str(s))
-    for i = AbzIList
+for traj = 1:Nrun
+    
+    for i = 1:height(cohort)
         
-        cd(num2str(i));
-        if s==A33
-            SampleConcentration = 0.3e-6;
-        else
-            SampleConcentration = 5e-6;
-        end
+        theseed = randomseeds(traj,i);
+        rng(theseed); %So that Fps MS0 cell type distriburions are consistently random per cohort member
+        randomFp = random('Normal',MeanFp,StdFp); %always a fixed but random precursor frequency in cohort member i
         
-        rng(i+traj*50); %So that Fps are randomly consistent
-        [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,random('Normal',Fp(s),FpSTD(s)),pdMS0); %#ok<AGROW>
-        temp = Response{s,i};
-        temp2 = pval{s,i};
-        IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
-        ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
-        cd ..
+        [Response{traj,i},pval{traj,i}] = Main_human(theseed,cohort(i,:),SampleConcentration,randomFp,pdMS0); 
+        temp = Response{traj,i};
+        temp2 = pval{traj,i};
+        IncoBinary(traj,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); 
+        ELISBinary(traj,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); 
         
     end
-    disp(s)
-    cd ..
-end
-toc
-% % % %
-for s = AbzII
-    cd(num2str(s))
-    for i = AbzIIList
-        if i~=55
-            cd(num2str(i));
-            if s==Exenatide
-                SampleConcentration = 0.3e-6;
-            elseif s== KLH
-                SampleConcentration = 20*0.3e-6;                
-            else
-                SampleConcentration = 5e-6;
-            end
-            
-            rng(i+traj*50); %So that Fps are randomly consistent           
-            [Response{s,i},pval{s,i}] = Main_human(i+traj*50,ProteinLength(s),SampleConcentration,random('Normal',Fp(s),FpSTD(s)),pdMS0); %#ok<AGROW>
-            temp = Response{s,i};
-            temp2 = pval{s,i};
-            IncoBinary(s,i) = sign(sum(((temp(1:4))>SIcutoff).*(temp2(1:4)<sigcutoff))); %#ok<AGROW>
-            ELISBinary(s,i) = (temp(5)>SIcutoff).*(temp2(5)<sigcutoff); %#ok<AGROW>
-            cd ..
-        end
-    end
-    disp(s)
-    cd ..
+    % Percent Similarity ELISpot vs Thymidine Incorporation
+    similarity(traj,1) = sum(~xor(IncoBinary(traj,:)',ELISBinary(traj,:)'))/height(cohort); 
+    
 end
 
 COMBOBinary = IncoBinary.*ELISBinary;
 
-Inco = sum(IncoBinary(:,1:50)')'*2 + sum(IncoBinary(:,[51:54 56:100])')'/49*100;
-ELIS = sum(ELISBinary(:,1:50)')'*2 + sum(ELISBinary(:,[51:54 56:100])')'/49*100;
-COMBO = sum(COMBOBinary(:,1:50)')'*2 + sum(COMBOBinary(:,[51:54 56:100])')'/49*100;
+%% Calculate statistics
+% Percent Responders
+Inco = sum(IncoBinary,2)/height(cohort)*100;
+ELIS = sum(ELISBinary,2)/height(cohort)*100;
+COMBO = sum(COMBOBinary,2)/height(cohort)*100;
 
-% Correlation
-Inco1 = IncoBinary(1:10,1:50); 
-Inco2 = IncoBinary(11:end,[51:54 56:100]);
-ELIS1 = ELISBinary(1:10,1:50); 
-ELIS2 = ELISBinary(11:end,[51:54 56:100]);
-corrs = [diag(corr(Inco1',ELIS1'));diag(corr(Inco2',ELIS2'))];
+% Mean and 95% CI in percent responders
+pd = fitdist(Inco,'Normal');
+IncoAllStats = icdf(truncate(pd,0,100),[0.025 0.5 0.975]);
+pd = fitdist(ELIS,'Normal');
+ELISAllStats = icdf(truncate(pd,0,100),[0.025 0.5 0.975]);
+pd = fitdist(COMBO,'Normal');
+COMBOAllStats = icdf(truncate(pd,0,100),[0.025 0.5 0.975]);
 
-save([num2str(traj) '_matlabRcutoff100Prol0597.mat'])
+% ELISpot vs Thymidine incorporation %similarity and 95% CI
+pd = fitdist(similarity,'Normal');
+SimilarityStats = icdf(truncate(pd,0,1),[0.025 0.5 0.975]);
+
+%% Write output
+cd ..\Output
+%Write summary output 
+fileID = fopen([antigenname '_' cohortname '_Summary.dat'],'w');
+header = ['%Responders to ' antigenname ' in the cohort (' cohortname '):']; 
+fprintf(fileID,'%s\n', header);
+str1 = ['by Thymidine Incroporation (95% CI): %' num2str(IncoAllStats(2)) ' (' num2str(IncoAllStats(1)) ',' num2str(IncoAllStats(3)) ')'];
+fprintf(fileID,'%s\n', str1);
+str2 = ['by IL-2 ELISpot (95% CI): %' num2str(ELISAllStats(2)) ' (' num2str(ELISAllStats(1)) ',' num2str(ELISAllStats(3)) ')'];
+fprintf(fileID,'%s\n', str2);
+str3 = ['by Combined Thymidine Incroporation IL-2 ELISpot (95% CI): %' num2str(COMBOAllStats(2)) ' (' num2str(COMBOAllStats(1)) ',' num2str(COMBOAllStats(3)) ')'];
+fprintf(fileID,'%s\n', str3);
+str4 = '--';
+fprintf(fileID,'%s\n', str4);
+str5 = ['%Similarity between Thymidine Incroporation IL-2 ELISpot predictions (95% CI): %' num2str(SimilarityStats(2)) ' (' num2str(SimilarityStats(1)) ',' num2str(SimilarityStats(3)) ')'];
+fprintf(fileID,'%s\n', str5);
+fclose(fileID);
+
+%Write Raw data
+dlmwrite([antigenname '_' cohortname '_IncorporationRaw.dat'],IncoBinary,'delimiter',',');
+dlmwrite([antigenname '_' cohortname '_ELISpotRaw.dat'],ELISBinary,'delimiter',',');
+dlmwrite([antigenname '_' cohortname '_COMBORaw.dat'],COMBOBinary,'delimiter',',');
+cd ..\Bin
+
+delete Parameters.mat
