@@ -2,12 +2,14 @@ function NumCellsper_ml = distributionofCells(MinNumPBMCs,MaxNumPBMCs,seed)
 
 fun = @(x)(sum(x)-100)^2; %x is the vector of cell percentages
 
-%Donor cell distribution variability
+%Donor cell distribution variability fixed
 rng(seed);
+
 % Dendritic Cells ; NK Cells; B Cells; CD4+; CD8+; Monocytes
 lb = [0.63;6.84;6.36;26.15;12.38;6.04];
 ub = [1.46;35.17;16.51;48.26;33.11;11.56];
-x0 = rand(6,1).*(ub-lb) + lb; %Random initial Start Point
+x0 = rand(6,1).*(ub-lb) + lb; %Random initial Start Point fixed for cohort member
+
 options = optimoptions('fmincon','Display','off');
 
 %Variation in the cell type distribution

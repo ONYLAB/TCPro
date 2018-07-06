@@ -1,15 +1,14 @@
-function Parameters(SimType,ProteinLength,Va,seed,SampleConcentration,Fp,pdMS0)
+function Parameters(SimType,cohort,Va,seed,SampleConcentration,Fp,pdMS0)
 
-%% Therapeutic protein dosage
+%% Pars initialization
+pars = zeros(1,43);
 
-%Va is the whole volume of the assay (sample + cells)
-% SampleConcentration [Molar] This is the actual concentration of the samples with respect to the cell-excluded volume
+% Va is the whole volume of the assay (sample + cells)
+% SampleConcentration [Molar] This is the actual initial concentration of the samples with respect to the cell-excluded volume
 Dose = SimType*SampleConcentration*Va*1e12;  % pmole
 
-% LE = 0.5; %ng/L Lower bound for Endoxin
-% UE = 25; %ng/L Upper bound
-rng(seed);
-Endotoxin = random(pdMS0); %LE + (UE-LE)*rand; %ng/L
+rng(seed); %Fixed for the cohort member
+Endotoxin = random(pdMS0);
 
 % NA: Avogadro constant
 NA = 6.0221367e23;
@@ -29,7 +28,7 @@ VolProliferationCellStock = Va * 0.5; %Initial total cell volume is half of the 
 
 % Number of HLA DRB1 molecules
 numHLADR = 1e5;
-[kon,koff,N,ME0] = doNETMHCIIpan(SimType,ProteinLength,NA,numHLADR); %N: #Epitopes
+[kon,koff,N,ME0] = doNETMHCIIpan(SimType,cohort,NA,numHLADR); %N: #Epitopes
 
 %% Dendritic cells
 % BetaID: death rate of immature dendritic cells.
@@ -164,91 +163,24 @@ pars=pars'; %#ok<NASGU>
 
 save Parameters.mat
 
-function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,ProteinLength,NA,numHLADR)
+function [kon,koff,N,ME0] = doNETMHCIIpan(SimType,cohort,NA,numHLADR)
 %% Collect -on, -off rates, number of epitopes and amount of initial MHC
 
-rankcutoff  = 100;
+homozygot = cohort{1,8};
+N = 1; %Single effective epitope (all 15-mers are lumped)
 
-[netmhciipanresult,N,numHLAalleles] = givekon();
-Affinity_DR = reshape(netmhciipanresult(1:N*numHLAalleles,1),N,numHLAalleles);
-Rank_DR = reshape(netmhciipanresult(1:N*numHLAalleles,2),N,numHLAalleles);
-
+Affinity_DR = cohort{1,6:7};
 Affinity_DPQ=repmat([4000 4000 4000 4000],N,1); %place holder for other alleles (NOT USED in this version)
 
-if numHLAalleles==1 %homozygot
-    disp('Homozygote');
-    rankadjustment = [Rank_DR<rankcutoff zeros(N,6-1)]; %Nx6 matrix
+if homozygot==1 %homozygot
     ME0=[numHLADR; 0.0;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
-    Affinity_DR = [Affinity_DR zeros(N,1)];
+    Affinity_DR = [Affinity_DR(1) zeros(N,1)];
 else
-    rankadjustment = [Rank_DR<rankcutoff zeros(N,6-2)]; %Nx6 matrix
     ME0=[numHLADR/2; numHLADR/2;  34E3/2; 34E3/2; 17.1E3/2; 17.1E3/2]/NA*1E12; % pmole
 end
 
-EpitopeSurvived = ones(N,6);
-% EpitopeLength = 15;
-% if ProteinLength>100
-%     for i = 1:N
-%         surviveP = ((1-(EpitopeLength-1)/(ProteinLength-1))^round(ProteinLength/EpitopeLength))>rand;
-%         EpitopeSurvived(i,:) = surviveP*ones(1,6);
-%     end
-% end
-
 % kon: on rate for for T-epitope-MHC-II binding
-kon=SimType*EpitopeSurvived.*rankadjustment*8.64*1E-3; %  pM-1day-1
+kon=SimType*ones(1,6)*8.64*1E-3; %  pM-1day-1
 
 %	koff:	off rate for for T-epitope-MHC-II binding
 koff=8.64*1E-3*[Affinity_DR Affinity_DPQ]*1E3; %  day-1
-
-function [AffinityandRank_DR,N,numHLAalleles] = givekon()
-% Read out.dat file
-if exist('shortout.dat')==0 %#ok<EXIST>
-    getshorty();
-end
-table = readtable('shortout.dat');
-AffinityandRank_DR = table{:,9:10}; 
-% Structured as 
-% [Epitope1 Allele1; 
-%     Epitope2 Allele1; 
-%     Epitope1 Allele2;
-% Epitope2 Allele2]
-
-N15mer = length(unique(table{:,3})); %Number of epitopes
-allele1 = AffinityandRank_DR(1:N15mer,:);
-allele2 = AffinityandRank_DR(N15mer+1:end,:);
-
-AffinityandRank_DR = [1./sum(1./allele1,1); 1./sum(1./allele2,1)];
-
-numHLAalleles = length(unique(table{:,2})); %number of HLAs
-
-N = 1;
-
-%% Post process NetMHCIIPan v3.2 out.dat file
-function getshorty()
-
-ind = 0;
-fid = fopen('out.dat');
-fidshort = fopen('shortout.dat','w');
-
-if contains(pwd,'seqs\10') %exanitide patch
-    lists = [57 270]; %use +3 for version 3.1
-elseif contains(pwd,'seqs\18') %exanitide patch 
-    lists = [32 65]; %use +3 for version 3.1
-elseif contains(pwd,'seqs\19') %exanitide patch 
-    lists = [14:10:254 263:10:503]; %use +3 for version 3.1
-else
-    lists = [12 21]; %use +3 for version 3.1
-end
-
-tline = fgetl(fid);
-while ischar(tline)
-    ind = ind + 1;
-    if ismember(ind,lists)
-        %     disp(tline)
-        fprintf(fidshort,'%s\n',tline);
-    end
-    tline = fgetl(fid);
-end
-
-fclose(fid);
-fclose(fidshort);

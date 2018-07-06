@@ -1,4 +1,4 @@
-function rank = IEDBScraper(peptidesequence,nallele,allelelist)
+function KD = IEDBScraper(peptidesequence,nallele,allelelist)
 
 url = 'http://tools-cluster-interface.iedb.org/tools_api/mhcii/';
 method = 'method';
@@ -28,19 +28,9 @@ while count == err_count
     count = count + 1;
 end
 
-% fileID = fopen('IEDBresult.dat','w');
-% nbytes = fprintf(fileID,'%c',response);
-% fclose(fileID);
-
-res = readtable('IEDBresult.dat','Delimiter','\t');
-for i = 1:nallele
-    temp = res(strcmp(res.allele,allelelist{i}),'percentile_rank');
-    rank(i,1) = temp.percentile_rank;
+%Scape KD data from IEDB per 15-mers
+lines = splitlines(response);
+for i = 2:length(lines)-1
+    temp = sscanf(lines{i},'%s%i%i%i%s%s%f%f');
+    KD(i-1,1) = temp(end-1);
 end
-
-if nallele == 1
-    rank(2,1) = rank(1,1); %Homozygote check
-end
-
-% convert rank to affinity
-% kon = f(rank);
