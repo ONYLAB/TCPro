@@ -21,7 +21,7 @@ VolProliferationCellStock = Va * 0.5; %Initial total cell volume is half of the 
 [ID0,NK,BC,NT0,~,MC] = collectdonorPBMC_analyze(MinNumPBMCs,MaxNumPBMCs,VolProliferationCellStock,seed);
 
 %% T-epitope characteristics of therapeutic proteins
-% N: the number of T-epitope (protein-specific)
+% N: the number of T-epitope (single effective epitope)
 % ME0:  initial amount of MHC-II molecule in a single mature dendritic cell pmole
 % kon: on rate for for T-epitope-MHC-II binding
 % koff:	off rate for for T-epitope-MHC-II binding

@@ -4,7 +4,7 @@ function [Response,pval] = Main_human(donor_ID,cohort,SampleConcentration,Fp,pdM
 %Make sure that all solution components are nonnegative (13 elements all >=0)
 options = odeset('RelTol',1e-10, 'AbsTol',1e-10, 'NonNegative', 1:13);
 
-% First dosing interval, protein specific
+% Time points for ODE set
 tspan1 = 0:0.25:8;
 
 %% AssayType == 'ELISpot'
@@ -24,7 +24,7 @@ for n = 1:6
         yic1 = [Ag0; MS0; ID0; MD0; AgE0; pE0; ME0; pME0; pM0; M0; NT0; AT_N0; Prolif0];
         
         % Call ODE
-        [T1,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
+        [~,Y1]=ode15s(@f, tspan1, yic1, options, pars); 
         
         IL2S = Y1(:,(20+13*N):(23+13*N));
         numIL2secretors = sum(IL2S(end,[1 3:4]));
@@ -120,5 +120,3 @@ tspan2 = linspace(t_start, t_end, numberoftimesamples);
 Prolif_vector = Y2(:,(20+13*N):(21+13*N));
 
 IncorporationResponse = sum(Prolif_vector(end,:)); %#Proliferated cells
-
-% plotNumCells(T2,Y2,N) %plot if wanted
