@@ -57,15 +57,15 @@ cd ..\Output
 fileID = fopen([antigenname '_' cohortname '_Summary.dat'],'w');
 header = ['%Responders to ' antigenname ' in the cohort (' cohortname '):']; 
 fprintf(fileID,'%s\n', header);
-str1 = ['by Thymidine Incroporation (95% CI): %' num2str(IncoAllStats(2)) ' (' num2str(IncoAllStats(1)) ',' num2str(IncoAllStats(3)) ')'];
+str1 = ['by Thymidine Incorporation (95% CI): %' num2str(IncoAllStats(2)) ' (' num2str(IncoAllStats(1)) ',' num2str(IncoAllStats(3)) ')'];
 fprintf(fileID,'%s\n', str1);
 str2 = ['by IL-2 ELISpot (95% CI): %' num2str(ELISAllStats(2)) ' (' num2str(ELISAllStats(1)) ',' num2str(ELISAllStats(3)) ')'];
 fprintf(fileID,'%s\n', str2);
-str3 = ['by Combined Thymidine Incroporation IL-2 ELISpot (95% CI): %' num2str(COMBOAllStats(2)) ' (' num2str(COMBOAllStats(1)) ',' num2str(COMBOAllStats(3)) ')'];
+str3 = ['by Combined Thymidine Incorporation & IL-2 ELISpot (95% CI): %' num2str(COMBOAllStats(2)) ' (' num2str(COMBOAllStats(1)) ',' num2str(COMBOAllStats(3)) ')'];
 fprintf(fileID,'%s\n', str3);
 str4 = '--';
 fprintf(fileID,'%s\n', str4);
-str5 = ['%Similarity between Thymidine Incroporation IL-2 ELISpot predictions (95% CI): %' num2str(SimilarityStats(2)) ' (' num2str(SimilarityStats(1)) ',' num2str(SimilarityStats(3)) ')'];
+str5 = ['%Similarity between Thymidine Incorporation & IL-2 ELISpot predictions (95% CI): %' num2str(SimilarityStats(2)) ' (' num2str(SimilarityStats(1)) ',' num2str(SimilarityStats(3)) ')'];
 fprintf(fileID,'%s\n', str5);
 fclose(fileID);
 
