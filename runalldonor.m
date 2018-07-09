@@ -27,7 +27,7 @@ for traj = 1:Nrun
         
     end
     % Percent Similarity ELISpot vs Thymidine Incorporation
-    similarity(traj,1) = sum(~xor(IncoBinary(traj,:)',ELISBinary(traj,:)'))/height(cohort); 
+    similarity(traj,1) = 100*sum(~xor(IncoBinary(traj,:)',ELISBinary(traj,:)'))/height(cohort); 
     
 end
 
